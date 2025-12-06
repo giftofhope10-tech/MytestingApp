@@ -31,18 +31,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     await resend.emails.send({
-      from: 'Close Testing Group <onboarding@resend.dev>',
+      from: 'Close Testing Group <idverify@closetesting.online>',
       to: email,
       subject: 'Your Verification Code - Close Testing Group',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #4F46E5;">Close Testing Group</h2>
-          <p>Your verification code is:</p>
-          <div style="background: #F3F4F6; padding: 20px; text-align: center; border-radius: 8px;">
-            <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #1F2937;">${otp}</span>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <img src="https://closetesting.online/logo.webp" alt="Close Testing Group" style="max-width: 200px; height: auto;" />
           </div>
-          <p style="color: #6B7280; margin-top: 20px;">This code will expire in 10 minutes.</p>
-          <p style="color: #6B7280;">If you didn't request this code, please ignore this email.</p>
+          <p style="color: #374151; font-size: 16px;">Your verification code is:</p>
+          <div style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); padding: 25px; text-align: center; border-radius: 12px; margin: 20px 0;">
+            <span style="font-size: 36px; font-weight: bold; letter-spacing: 10px; color: #FFFFFF;">${otp}</span>
+          </div>
+          <p style="color: #6B7280; margin-top: 20px; font-size: 14px;">This code will expire in 10 minutes.</p>
+          <p style="color: #6B7280; font-size: 14px;">If you didn't request this code, please ignore this email.</p>
+          <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 30px 0;" />
+          <p style="color: #9CA3AF; font-size: 12px; text-align: center;">
+            Close Testing Group - Professional Google Play Closed Testing Platform<br/>
+            Need help? Contact us at <a href="mailto:support@closetesting.online" style="color: #4F46E5;">support@closetesting.online</a>
+          </p>
         </div>
       `,
     });

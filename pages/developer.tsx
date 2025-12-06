@@ -26,11 +26,24 @@ export default function DeveloperDashboard() {
       const appsData = await appsRes.json();
       const requestsData = await requestsRes.json();
 
-      const myApps = appsData.filter((app: App) => app.developerEmail === email);
-      setApps(myApps);
-      setRequests(requestsData);
+      if (appsRes.ok && Array.isArray(appsData)) {
+        const myApps = appsData.filter((app: App) => app.developerEmail === email);
+        setApps(myApps);
+      } else {
+        console.error('Failed to fetch apps:', appsData?.error || 'Invalid response');
+        setApps([]);
+      }
+
+      if (requestsRes.ok && Array.isArray(requestsData)) {
+        setRequests(requestsData);
+      } else {
+        console.error('Failed to fetch requests:', requestsData?.error || 'Invalid response');
+        setRequests([]);
+      }
     } catch (error) {
       console.error('Failed to fetch data:', error);
+      setApps([]);
+      setRequests([]);
     } finally {
       setLoading(false);
     }

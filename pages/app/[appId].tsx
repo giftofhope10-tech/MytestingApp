@@ -36,9 +36,13 @@ export default function AppDetails() {
     try {
       const res = await fetch(`/api/tester-requests?testerEmail=${email}&appId=${appId}`);
       const data = await res.json();
-      const request = data.find((r: TesterRequest) => r.appId === appId);
-      if (request) {
-        setTesterRequest(request);
+      if (res.ok && Array.isArray(data)) {
+        const request = data.find((r: TesterRequest) => r.appId === appId);
+        if (request) {
+          setTesterRequest(request);
+        }
+      } else {
+        console.error('Failed to check request:', data?.error || 'Invalid response');
       }
     } catch (error) {
       console.error('Failed to check request:', error);

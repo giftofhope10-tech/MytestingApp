@@ -17,9 +17,15 @@ export default function Home() {
     try {
       const res = await fetch('/api/apps');
       const data = await res.json();
-      setApps(data);
+      if (res.ok && Array.isArray(data)) {
+        setApps(data);
+      } else {
+        console.error('Failed to fetch apps:', data?.error || 'Invalid response');
+        setApps([]);
+      }
     } catch (error) {
       console.error('Failed to fetch apps:', error);
+      setApps([]);
     } finally {
       setLoading(false);
     }

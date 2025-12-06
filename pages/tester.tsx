@@ -23,17 +23,28 @@ export default function TesterDashboard() {
     try {
       const requestsRes = await fetch(`/api/tester-requests?testerEmail=${email}`);
       const requestsData = await requestsRes.json();
-      setRequests(requestsData);
+      if (requestsRes.ok && Array.isArray(requestsData)) {
+        setRequests(requestsData);
+      } else {
+        console.error('Failed to fetch requests:', requestsData?.error || 'Invalid response');
+        setRequests([]);
+      }
 
       const appsRes = await fetch('/api/apps');
       const appsData = await appsRes.json();
       const appsMap: Record<string, App> = {};
-      appsData.forEach((app: App) => {
-        appsMap[app.appId] = app;
-      });
+      if (appsRes.ok && Array.isArray(appsData)) {
+        appsData.forEach((app: App) => {
+          appsMap[app.appId] = app;
+        });
+      } else {
+        console.error('Failed to fetch apps:', appsData?.error || 'Invalid response');
+      }
       setApps(appsMap);
     } catch (error) {
       console.error('Failed to fetch data:', error);
+      setRequests([]);
+      setApps({});
     } finally {
       setLoading(false);
     }

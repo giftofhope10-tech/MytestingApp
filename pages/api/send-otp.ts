@@ -21,7 +21,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const otp = generateOTP();
-  await storeOTP(email, otp);
+  
+  try {
+    await storeOTP(email, otp);
+  } catch (storeError) {
+    console.error('Failed to store OTP:', storeError);
+    return res.status(500).json({ error: 'Database error. Please ensure Firestore is enabled in your Firebase project.' });
+  }
 
   try {
     await resend.emails.send({

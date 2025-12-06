@@ -1,108 +1,114 @@
 # Close Testing Group
 
-A web platform for managing Google Play closed testing programs. Developers can submit apps for testing, and testers can join testing programs with email verification.
+A web platform for managing Google Play closed testing programs. Developers can submit apps for testing, and testers can join testing programs.
 
 ## Tech Stack
-- **Frontend**: Next.js with React and TailwindCSS
+- **Frontend**: Next.js 16 with React and TailwindCSS
 - **Database**: Firebase Firestore
 - **Email**: Resend for OTP verification
-- **Hosting**: Runs on port 5000
+- **Hosting**: Runs on port 5000 (Vercel-ready)
 
 ## Project Structure
 
 ```
 ├── pages/
 │   ├── index.tsx          # Home page with app listings
-│   ├── submit.tsx         # Developer app submission (3-step wizard)
+│   ├── submit.tsx         # Developer app submission
+│   ├── dashboard.tsx      # User dashboard
 │   ├── developer.tsx      # Developer dashboard
-│   ├── tester.tsx         # Tester dashboard with check-in
+│   ├── tester.tsx         # Tester dashboard
+│   ├── sitemap.xml.tsx    # Dynamic XML sitemap
+│   ├── _document.tsx      # Custom document with preloading
 │   ├── app/
-│   │   └── [appId].tsx    # App details and tester request
+│   │   └── [appId].tsx    # App details
 │   ├── blog/
-│   │   ├── index.tsx      # Blog listing page
-│   │   └── [slug].tsx     # Individual blog post page
+│   │   ├── index.tsx      # Blog listing
+│   │   └── [slug].tsx     # Dynamic blog posts
 │   ├── admin/
-│   │   ├── index.tsx      # Admin panel with session auth
-│   │   ├── users.tsx      # Admin user management
-│   │   └── blog/
-│   │       ├── new.tsx    # New blog post editor
-│   │       └── [id].tsx   # Edit blog post page
-│   └── api/
-│       ├── apps.ts        # GET/POST apps
-│       ├── apps/[appId].ts # GET/PATCH single app
-│       ├── send-otp.ts    # Send OTP email
-│       ├── verify-otp.ts  # Verify OTP code
-│       ├── tester-requests.ts    # GET/POST tester requests
-│       ├── tester-requests/[id].ts # PATCH request status
-│       ├── check-in.ts    # Daily tester check-in
-│       ├── blog/
-│       │   ├── index.ts   # Blog CRUD API
-│       │   └── [id].ts    # Individual blog API
-│       └── admin/
-│           ├── session.ts # Admin session management
-│           ├── check.ts   # Admin auth check
-│           └── add.ts     # Add new admin users
+│   │   ├── index.tsx      # Admin panel (token auth)
+│   │   ├── login.tsx      # Admin login
+│   │   ├── dashboard.tsx  # Admin dashboard
+│   │   ├── users.tsx      # User management
+│   │   └── blog/          # Blog management
+│   └── api/               # API endpoints
 ├── components/
-│   ├── Layout.tsx         # Main layout with navigation
+│   ├── Layout.tsx         # Main layout with SEO
 │   ├── AppCard.tsx        # App card display
-│   ├── OTPVerification.tsx # Email OTP component
-│   └── ProgressBar.tsx    # 14-day progress tracker
+│   ├── OTPVerification.tsx
+│   └── ProgressBar.tsx
 ├── lib/
-│   ├── firebase.ts        # Firebase client config
-│   ├── firebase-admin.ts  # Firebase admin config
-│   ├── otp.ts             # OTP generation/verification
-│   ├── tempmail.ts        # Temporary email detection
-│   ├── session.ts         # Session management utilities
-│   └── types.ts           # TypeScript interfaces
+│   ├── firebase.ts        # Firebase client
+│   ├── firebase-admin.ts  # Firebase admin
+│   ├── otp.ts             # OTP logic
+│   ├── tempmail.ts        # Temp email detection
+│   ├── session.ts         # Session management
+│   └── types.ts           # TypeScript types
+├── public/
+│   ├── robots.txt         # SEO robots file
+│   ├── logo.png
+│   └── favicon.ico
 └── styles/
-    └── globals.css        # Global styles with Tailwind
+    └── globals.css
 ```
 
 ## Required Environment Variables
 
-Add these in the Secrets tab:
-- `NEXT_PUBLIC_FIREBASE_API_KEY` - Firebase API key
-- `NEXT_PUBLIC_FIREBASE_PROJECT_ID` - Firebase project ID
-- `NEXT_PUBLIC_FIREBASE_APP_ID` - Firebase App ID
-- `RESEND_API_KEY` - Resend API key for emails
+| Variable | Description |
+|----------|-------------|
+| NEXT_PUBLIC_FIREBASE_API_KEY | Firebase API key |
+| NEXT_PUBLIC_FIREBASE_PROJECT_ID | Firebase project ID |
+| NEXT_PUBLIC_FIREBASE_APP_ID | Firebase App ID |
+| FIREBASE_SERVICE_ACCOUNT_KEY | Firebase admin SDK (JSON) |
+| RESEND_API_KEY | Resend API key for emails |
+| ADMIN_TOKEN_HASH | SHA-256 hash of admin token |
 
 ## Features
 
 ### For Developers
-- Submit apps with 3-step wizard (app info, Play Store link, contact)
-- Email verification via OTP
-- Dashboard to approve/reject tester requests
-- View tester statistics and progress
+- Submit apps with verification
+- Dashboard to manage testers
+- View tester statistics
 
 ### For Testers
-- Browse available apps for testing
-- Request to join testing programs
-- Daily check-in system (14-day tracking)
+- Browse apps for testing
+- Request to join programs
+- Daily check-in system (14-day)
 - Progress visualization
-- Rate apps after testing period
 
-### Admin Panel & Blog CMS
-- Admin authentication with OTP verification + session tokens
-- Create, edit, and delete blog posts
-- Rich text editor with title and content
-- Publish/draft status for blog posts
-- SEO-friendly URLs using slugs
-- Admin user management (add/remove admins)
+### Admin Panel
+- Token-based authentication (no email required)
+- Blog post management (create/edit/delete)
+- User management
 
-### Security
-- OTP email verification for all users
-- Temporary email detection (blocks disposable emails)
-- Session-based authentication for admin panel
-- OTP verification required before session creation (5-minute window)
-- One-time use verification tokens
+### SEO
+- robots.txt configured
+- Dynamic sitemap.xml
+- Open Graph meta tags
+- Twitter Cards
+- Canonical URLs
+
+## Performance Optimizations
+- Image optimization (WebP/AVIF)
+- Static asset caching (1 year)
+- DNS prefetching
+- Compression enabled
+- Security headers configured
 
 ## Development
 
-The app runs on port 5000. Start with:
 ```bash
 npm run dev
 ```
 
 ## Deployment
 
-Configure for Vercel or similar Next.js hosting. Ensure all environment variables are set in production.
+Ready for Vercel deployment. Set all environment variables in Vercel dashboard before deploying.
+
+## Recent Changes (December 6, 2025)
+- Admin panel simplified to token-only auth
+- Added robots.txt and sitemap.xml
+- SEO meta tags added (Open Graph, Twitter Cards)
+- Performance optimizations for Vercel
+- Security headers configured
+- Removed duplicate blog pages
+- Created OPTIMIZATION_REPORT.md

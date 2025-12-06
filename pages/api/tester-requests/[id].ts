@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { db } from '../../../lib/firebase';
-import { collection, getDocs, query, where, doc, updateDoc } from 'firebase/firestore';
+import { adminDb } from '../../../lib/firebase-admin';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
@@ -9,18 +8,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const { status, daysTested, lastTestDate, rating, feedback, developerEmail, testerEmail } = req.body;
       
-      const requestsRef = collection(db, 'testerRequests');
-      const q = query(requestsRef, where('id', '==', id));
-      const snapshot = await getDocs(q);
+      const requestsRef = adminDb.collection('testerRequests');
+      const snapshot = await requestsRef.where('id', '==', id).get();
       
       if (snapshot.empty) {
         return res.status(404).json({ error: 'Request not found' });
       }
 
-      let requestDocId = '';
+      let requestDocRef: FirebaseFirestore.DocumentReference | null = null;
       let requestData: any = null;
       snapshot.forEach((docSnap) => {
-        requestDocId = docSnap.id;
+        requestDocRef = docSnap.ref;
         requestData = docSnap.data();
       });
 
@@ -28,9 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       
       if (status !== undefined) {
         if (developerEmail) {
-          const appsRef = collection(db, 'apps');
-          const appQuery = query(appsRef, where('appId', '==', requestData.appId));
-          const appSnapshot = await getDocs(appQuery);
+          const appsRef = adminDb.collection('apps');
+          const appSnapshot = await appsRef.where('appId', '==', requestData.appId).get();
           
           let authorized = false;
           appSnapshot.forEach((docSnap) => {
@@ -63,20 +60,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (rating !== undefined) {
         updateData.rating = rating;
         
-        const appsRef = collection(db, 'apps');
-        const appQuery = query(appsRef, where('appId', '==', requestData.appId));
-        const appSnapshot = await getDocs(appQuery);
+        const appsRef = adminDb.collection('apps');
+        const appSnapshot = await appsRef.where('appId', '==', requestData.appId).get();
         
-        appSnapshot.forEach(async (docSnap) => {
+        const batch = adminDb.batch();
+        appSnapshot.forEach((docSnap) => {
           const appData = docSnap.data();
           const newTotalRatings = (appData.totalRatings || 0) + 1;
           const newRating = ((appData.rating || 0) * (appData.totalRatings || 0) + rating) / newTotalRatings;
           
-          await updateDoc(doc(db, 'apps', docSnap.id), {
+          batch.update(docSnap.ref, {
             rating: newRating,
             totalRatings: newTotalRatings,
           });
         });
+        await batch.commit();
       }
 
       if (feedback !== undefined) {
@@ -87,7 +85,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         updateData.completedBadge = true;
       }
 
-      await updateDoc(doc(db, 'testerRequests', requestDocId), updateData);
+      await requestDocRef!.update(updateData);
 
       return res.status(200).json({ message: 'Request updated successfully' });
     } catch (error) {

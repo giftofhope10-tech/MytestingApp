@@ -1,15 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { db } from '../../../lib/firebase';
-import { collection, getDocs, query, orderBy, where, addDoc, serverTimestamp } from 'firebase/firestore';
+import { adminDb } from '../../../lib/firebase-admin';
 import { v4 as uuidv4 } from 'uuid';
 import type { App } from '../../../lib/types';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
-      const appsRef = collection(db, 'apps');
-      const q = query(appsRef, orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
+      const appsRef = adminDb.collection('apps');
+      const snapshot = await appsRef.orderBy('createdAt', 'desc').get();
       
       const apps: App[] = [];
       snapshot.forEach((doc) => {
@@ -31,9 +29,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
-      const developersRef = collection(db, 'developers');
-      const devQuery = query(developersRef, where('developerEmail', '==', developerEmail));
-      const devSnapshot = await getDocs(devQuery);
+      const developersRef = adminDb.collection('developers');
+      const devSnapshot = await developersRef.where('developerEmail', '==', developerEmail).get();
 
       let hasActiveApp = false;
       devSnapshot.forEach((doc) => {
@@ -62,23 +59,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         totalRatings: 0,
       };
 
-      await addDoc(collection(db, 'apps'), newApp);
+      await adminDb.collection('apps').add(newApp);
 
       if (devSnapshot.empty) {
-        await addDoc(collection(db, 'developers'), {
+        await adminDb.collection('developers').add({
           developerEmail,
           verified: true,
           activeAppId: appId,
           createdAt: Date.now(),
         });
       } else {
-        const { updateDoc, doc } = await import('firebase/firestore');
-        devSnapshot.forEach(async (docSnap) => {
-          await updateDoc(doc(db, 'developers', docSnap.id), {
+        const batch = adminDb.batch();
+        devSnapshot.forEach((docSnap) => {
+          batch.update(docSnap.ref, {
             activeAppId: appId,
             verified: true,
           });
         });
+        await batch.commit();
       }
 
       return res.status(201).json({ appId, message: 'App submitted successfully' });

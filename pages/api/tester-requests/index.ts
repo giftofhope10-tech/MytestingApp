@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { db } from '../../../lib/firebase';
-import { collection, getDocs, query, where, addDoc } from 'firebase/firestore';
+import { adminDb } from '../../../lib/firebase-admin';
 import { v4 as uuidv4 } from 'uuid';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -8,17 +7,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const { appId, testerEmail, developerEmail } = req.query;
       
-      const requestsRef = collection(db, 'testerRequests');
-      let q;
+      const requestsRef = adminDb.collection('testerRequests');
+      let snapshot;
       
       if (appId) {
-        q = query(requestsRef, where('appId', '==', appId));
+        snapshot = await requestsRef.where('appId', '==', appId).get();
       } else if (testerEmail) {
-        q = query(requestsRef, where('testerEmail', '==', testerEmail));
+        snapshot = await requestsRef.where('testerEmail', '==', testerEmail).get();
       } else if (developerEmail) {
-        const appsRef = collection(db, 'apps');
-        const appsQuery = query(appsRef, where('developerEmail', '==', developerEmail));
-        const appsSnapshot = await getDocs(appsQuery);
+        const appsRef = adminDb.collection('apps');
+        const appsSnapshot = await appsRef.where('developerEmail', '==', developerEmail).get();
         
         const appIds: string[] = [];
         appsSnapshot.forEach((doc) => {
@@ -31,8 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         
         const allRequests: any[] = [];
         for (const id of appIds) {
-          const reqQuery = query(requestsRef, where('appId', '==', id));
-          const reqSnapshot = await getDocs(reqQuery);
+          const reqSnapshot = await requestsRef.where('appId', '==', id).get();
           reqSnapshot.forEach((doc) => {
             allRequests.push({ id: doc.id, ...doc.data() });
           });
@@ -43,7 +40,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Query parameter required' });
       }
       
-      const snapshot = await getDocs(q!);
       const requests: object[] = [];
       snapshot.forEach((docSnap) => {
         const data = docSnap.data() as Record<string, unknown>;
@@ -65,13 +61,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
-      const requestsRef = collection(db, 'testerRequests');
-      const existingQuery = query(
-        requestsRef, 
-        where('testerEmail', '==', testerEmail),
-        where('appId', '==', appId)
-      );
-      const existingSnapshot = await getDocs(existingQuery);
+      const requestsRef = adminDb.collection('testerRequests');
+      const existingSnapshot = await requestsRef
+        .where('testerEmail', '==', testerEmail)
+        .where('appId', '==', appId)
+        .get();
 
       if (!existingSnapshot.empty) {
         return res.status(400).json({ error: 'You have already requested to test this app.' });
@@ -87,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         requestedAt: Date.now(),
       };
 
-      await addDoc(collection(db, 'testerRequests'), newRequest);
+      await adminDb.collection('testerRequests').add(newRequest);
 
       return res.status(201).json({ message: 'Request submitted successfully' });
     } catch (error) {

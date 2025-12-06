@@ -13,6 +13,9 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [error, setError] = useState('');
+  const [loginMethod, setLoginMethod] = useState<'email' | 'token'>('email');
+  const [adminToken, setAdminToken] = useState('');
+  const [tokenLoading, setTokenLoading] = useState(false);
 
   useEffect(() => {
     const savedToken = localStorage.getItem('adminSessionToken');
@@ -97,6 +100,38 @@ export default function AdminPanel() {
     createSession(email);
   };
 
+  const handleTokenLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTokenLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: adminToken }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.sessionToken) {
+        localStorage.setItem('adminSessionToken', data.sessionToken);
+        setSessionToken(data.sessionToken);
+        setIsAdmin(true);
+        setVerified(true);
+        setAdminRole('admin');
+        setEmail('Token Admin');
+        fetchBlogs(data.sessionToken);
+      } else {
+        setError(data.error || 'Invalid admin token');
+      }
+    } catch (err) {
+      setError('Connection error. Please try again.');
+    } finally {
+      setTokenLoading(false);
+    }
+  };
+
   const handleDelete = async (blogId: string) => {
     if (!confirm('Are you sure you want to delete this blog post?')) return;
     
@@ -153,16 +188,73 @@ export default function AdminPanel() {
       <Layout title="Admin Panel - Close Testing Group">
         <div className="max-w-md mx-auto">
           <h1 className="text-2xl font-bold text-center mb-6">Admin Login</h1>
+          
+          {/* Login Method Toggle */}
+          <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => { setLoginMethod('email'); setError(''); }}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
+                loginMethod === 'email'
+                  ? 'bg-white shadow text-indigo-600'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Email Verification
+            </button>
+            <button
+              onClick={() => { setLoginMethod('token'); setError(''); }}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
+                loginMethod === 'token'
+                  ? 'bg-white shadow text-indigo-600'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Admin Token
+            </button>
+          </div>
+
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
               {error}
             </div>
           )}
-          <OTPVerification
-            email={email}
-            onEmailChange={setEmail}
-            onVerified={handleVerified}
-          />
+
+          {loginMethod === 'email' ? (
+            <OTPVerification
+              email={email}
+              onEmailChange={setEmail}
+              onVerified={handleVerified}
+            />
+          ) : (
+            <form onSubmit={handleTokenLogin} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+              <div className="mb-4">
+                <label htmlFor="adminToken" className="block text-sm font-medium text-gray-700 mb-2">
+                  Admin Token
+                </label>
+                <input
+                  id="adminToken"
+                  type="password"
+                  value={adminToken}
+                  onChange={(e) => setAdminToken(e.target.value)}
+                  placeholder="Enter your admin token"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  required
+                  minLength={32}
+                  maxLength={64}
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Enter the 32-character admin token
+                </p>
+              </div>
+              <button
+                type="submit"
+                disabled={tokenLoading || adminToken.length < 32}
+                className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                {tokenLoading ? 'Authenticating...' : 'Login with Token'}
+              </button>
+            </form>
+          )}
         </div>
       </Layout>
     );

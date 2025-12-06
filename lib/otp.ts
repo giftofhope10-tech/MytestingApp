@@ -62,6 +62,12 @@ export async function verifyOTP(email: string, code: string): Promise<{ valid: b
     }
 
     await docRef.delete();
+    
+    await adminDb.collection('verifiedEmails').doc(normalizedEmail).set({
+      email: normalizedEmail,
+      verifiedAt: Timestamp.now(),
+    });
+    
     return { valid: true, message: 'OTP verified successfully.' };
   } catch (error) {
     console.error('Error verifying OTP:', error);

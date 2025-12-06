@@ -13,7 +13,7 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const sendOTP = async () => {
+  const checkAndVerify = async () => {
     if (!email) {
       setError('Please enter your email');
       return;
@@ -23,6 +23,20 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
     setError('');
 
     try {
+      const checkRes = await fetch('/api/check-verified', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const checkData = await checkRes.json();
+
+      if (checkRes.ok && checkData.verified) {
+        setSuccess('Email already verified! Logging in...');
+        setTimeout(() => onVerified(), 500);
+        return;
+      }
+
       const res = await fetch('/api/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -92,7 +106,7 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
             />
           </div>
           <button
-            onClick={sendOTP}
+            onClick={checkAndVerify}
             disabled={loading}
             className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-medium shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/60 disabled:opacity-50 transition-all text-sm sm:text-base"
           >

@@ -17,6 +17,8 @@ export default function TesterDashboard() {
   const [checkingIn, setCheckingIn] = useState<string | null>(null);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [ratingData, setRatingData] = useState<Record<string, { rating: number; feedback: string }>>({});
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -54,8 +56,52 @@ export default function TesterDashboard() {
     if (router.query.email) {
       setEmail(router.query.email as string);
       setVerified(true);
+      localStorage.setItem('testerEmail', router.query.email as string);
+    } else {
+      const savedEmail = localStorage.getItem('testerEmail');
+      if (savedEmail) {
+        setEmail(savedEmail);
+        setVerified(true);
+      }
     }
   }, [router.query]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('testerEmail');
+    setVerified(false);
+    setEmail('');
+    setRequests([]);
+    setApps({});
+  };
+
+  const hasActiveTesting = requests.some(r => r.status === 'approved' && r.daysTested < 14);
+
+  const handleDeleteAccount = async () => {
+    if (hasActiveTesting) return;
+    
+    setDeleting(true);
+    try {
+      const res = await fetch('/api/delete-account', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, type: 'tester' }),
+      });
+
+      if (res.ok) {
+        localStorage.removeItem('testerEmail');
+        setVerified(false);
+        setEmail('');
+        setRequests([]);
+        setApps({});
+        setShowDeleteModal(false);
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('Failed to delete account:', error);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     if (verified && email) {
@@ -152,16 +198,58 @@ export default function TesterDashboard() {
 
   return (
     <Layout title="Tester Dashboard - Close Testing Group">
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Tester Dashboard</h1>
-            <p className="text-gray-500">{email}</p>
+      <div className="space-y-6 sm:space-y-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Tester Dashboard</h1>
+            <p className="text-gray-500 text-sm sm:text-base truncate">{email}</p>
           </div>
-          <Link href="/" className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
-            Browse Apps
-          </Link>
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            <Link href="/" className="flex-1 sm:flex-none bg-indigo-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base text-center whitespace-nowrap">
+              Browse Apps
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex-1 sm:flex-none bg-gray-200 text-gray-700 px-4 sm:px-6 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base whitespace-nowrap"
+            >
+              Logout
+            </button>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              disabled={hasActiveTesting}
+              className="flex-1 sm:flex-none bg-red-100 text-red-600 px-4 sm:px-6 py-2 rounded-lg hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm sm:text-base whitespace-nowrap"
+              title={hasActiveTesting ? 'Complete all active tests before deleting account' : 'Delete account'}
+            >
+              Delete Account
+            </button>
+          </div>
         </div>
+
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl p-6 max-w-md w-full">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Delete Account?</h3>
+              <p className="text-gray-600 mb-6">
+                This will permanently delete your account and all your test history. You will need to verify your email again to use the platform.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 transition"
+                >
+                  {deleting ? 'Deleting...' : 'Delete Account'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {message.text && (
           <div className={`p-4 rounded-lg ${
@@ -173,18 +261,18 @@ export default function TesterDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-            <div className="text-3xl font-bold text-indigo-600">{requests.length}</div>
-            <div className="text-gray-500">Total Requests</div>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6 text-center">
+            <div className="text-xl sm:text-3xl font-bold text-indigo-600">{requests.length}</div>
+            <div className="text-xs sm:text-base text-gray-500">Total Requests</div>
           </div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-            <div className="text-3xl font-bold text-green-600">{approvedRequests.length}</div>
-            <div className="text-gray-500">Active Tests</div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6 text-center">
+            <div className="text-xl sm:text-3xl font-bold text-green-600">{approvedRequests.length}</div>
+            <div className="text-xs sm:text-base text-gray-500">Active Tests</div>
           </div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
-            <div className="text-3xl font-bold text-yellow-600">{completedTests.length}</div>
-            <div className="text-gray-500">Completed</div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6 text-center">
+            <div className="text-xl sm:text-3xl font-bold text-yellow-600">{completedTests.length}</div>
+            <div className="text-xs sm:text-base text-gray-500">Completed</div>
           </div>
         </div>
 

@@ -31,6 +31,7 @@ export interface TesterRequest {
   feedback?: string;
   rating?: number;
   completedBadge?: boolean;
+  bugReport?: string;
 }
 
 export interface Rating {

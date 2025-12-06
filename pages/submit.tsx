@@ -237,10 +237,6 @@ export default function SubmitApp() {
                   </li>
                   <li className="flex items-start gap-2 sm:gap-3">
                     <span className="text-emerald-500 mt-0.5 flex-shrink-0">✓</span>
-                    <span>I can only have one active listing at a time.</span>
-                  </li>
-                  <li className="flex items-start gap-2 sm:gap-3">
-                    <span className="text-emerald-500 mt-0.5 flex-shrink-0">✓</span>
                     <span>I will provide a working test link.</span>
                   </li>
                 </ul>

@@ -6,7 +6,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'PATCH') {
     try {
-      const { status, daysTested, lastTestDate, rating, feedback, developerEmail, testerEmail } = req.body;
+      const { status, rating, feedback, developerEmail, testerEmail } = req.body;
       
       const requestsRef = adminDb.collection('testerRequests');
       const snapshot = await requestsRef.where('id', '==', id).get();
@@ -46,16 +46,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
 
-      if (daysTested !== undefined) {
-        if (requestData.testerEmail !== testerEmail) {
-          return res.status(403).json({ error: 'Unauthorized' });
-        }
-        updateData.daysTested = daysTested;
-      }
-
-      if (lastTestDate !== undefined) {
-        updateData.lastTestDate = lastTestDate;
-      }
 
       if (rating !== undefined) {
         updateData.rating = rating;
@@ -81,8 +71,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         updateData.feedback = feedback;
       }
 
-      if (daysTested >= 14) {
-        updateData.completedBadge = true;
+      if (req.body.bugReport !== undefined) {
+        updateData.bugReport = req.body.bugReport;
       }
 
       await requestDocRef!.update(updateData);

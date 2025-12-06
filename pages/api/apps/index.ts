@@ -32,18 +32,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const developersRef = adminDb.collection('developers');
       const devSnapshot = await developersRef.where('developerEmail', '==', developerEmail).get();
 
-      let hasActiveApp = false;
-      devSnapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.activeAppId) {
-          hasActiveApp = true;
-        }
-      });
-
-      if (hasActiveApp) {
-        return res.status(400).json({ error: 'You already have an active app listing. Complete the current cycle first.' });
-      }
-
       const appId = uuidv4();
       const newApp = {
         appId,

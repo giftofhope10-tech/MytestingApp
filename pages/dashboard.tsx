@@ -25,7 +25,7 @@ export default function UnifiedDashboard() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [checkingIn, setCheckingIn] = useState<string | null>(null);
   const [message, setMessage] = useState({ type: '', text: '' });
-  const [ratingData, setRatingData] = useState<Record<string, { rating: number; feedback: string }>>({});
+  const [ratingData, setRatingData] = useState<Record<string, { rating: number; feedback: string; bugReport: string }>>({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -115,7 +115,7 @@ export default function UnifiedDashboard() {
   };
 
   const hasActiveApps = myApps.some(app => app.status === 'active');
-  const hasActiveTesting = testerRequests.some(r => r.status === 'approved' && r.daysTested < 14);
+  const hasActiveTesting = testerRequests.some(r => r.status === 'approved');
   const canDeleteAccount = !hasActiveApps && !hasActiveTesting;
 
   const handleDeleteAccount = async () => {
@@ -221,6 +221,7 @@ export default function UnifiedDashboard() {
         body: JSON.stringify({
           rating: data.rating,
           feedback: data.feedback,
+          bugReport: data.bugReport,
           testerEmail: email,
         }),
       });
@@ -237,8 +238,36 @@ export default function UnifiedDashboard() {
     }
   };
 
+  const submitBugReport = async (requestId: string) => {
+    const data = ratingData[requestId];
+    if (!data?.bugReport?.trim()) {
+      setMessage({ type: 'error', text: 'Please enter a bug report' });
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/tester-requests/${requestId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bugReport: data.bugReport,
+          testerEmail: email,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to submit bug report');
+      }
+
+      setMessage({ type: 'success', text: 'Bug report submitted successfully!' });
+      fetchData();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit bug report';
+      setMessage({ type: 'error', text: errorMessage });
+    }
+  };
+
   const canCheckIn = (request: TesterRequest) => {
-    if (request.daysTested >= 14) return false;
     const today = new Date().toISOString().split('T')[0];
     return request.lastTestDate !== today;
   };
@@ -268,7 +297,7 @@ export default function UnifiedDashboard() {
 
   const approvedTesterRequests = testerRequests.filter((r) => r.status === 'approved');
   const pendingTesterRequests = testerRequests.filter((r) => r.status === 'pending');
-  const completedTests = approvedTesterRequests.filter((r) => r.daysTested >= 14);
+  const completedTests = approvedTesterRequests.filter((r) => r.rating);
 
   return (
     <Layout title="Dashboard - Close Testing Group">
@@ -458,20 +487,33 @@ export default function UnifiedDashboard() {
                               <div key={request.id} className="p-4 bg-white border border-gray-200 rounded-lg">
                                 <div className="flex items-center justify-between mb-2">
                                   <span className="font-medium text-gray-900 text-sm">{request.testerEmail}</span>
-                                  {request.completedBadge && (
-                                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
-                                      Completed
-                                    </span>
-                                  )}
-                                </div>
-                                <ProgressBar current={request.daysTested} total={14} />
-                                {request.rating && (
-                                  <div className="mt-2 flex items-center gap-2">
-                                    <span className="text-yellow-400">★</span>
-                                    <span className="text-sm font-medium">{request.rating}/5</span>
-                                    {request.feedback && (
-                                      <span className="text-sm text-gray-500">- &quot;{request.feedback}&quot;</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-500">{request.daysTested} days tested</span>
+                                    {request.completedBadge && (
+                                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
+                                        Active
+                                      </span>
                                     )}
+                                  </div>
+                                </div>
+                                {request.rating && (
+                                  <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <span className="text-yellow-400">{'★'.repeat(request.rating)}{'☆'.repeat(5 - request.rating)}</span>
+                                      <span className="text-sm font-medium">{request.rating}/5</span>
+                                    </div>
+                                    {request.feedback && (
+                                      <p className="text-sm text-gray-600">&quot;{request.feedback}&quot;</p>
+                                    )}
+                                  </div>
+                                )}
+                                {request.bugReport && (
+                                  <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <span className="text-red-500">🐛</span>
+                                      <span className="text-sm font-medium text-red-700">Bug Report</span>
+                                    </div>
+                                    <p className="text-sm text-gray-700">{request.bugReport}</p>
                                   </div>
                                 )}
                               </div>
@@ -554,7 +596,12 @@ export default function UnifiedDashboard() {
                                 </div>
                               </div>
 
-                              <ProgressBar current={request.daysTested} total={14} />
+                              <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-200 mb-4">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm text-indigo-700 font-medium">Days Tested</span>
+                                  <span className="text-lg font-bold text-indigo-600">{request.daysTested}</span>
+                                </div>
+                              </div>
 
                               <div className="flex gap-4 mt-4">
                                 <a
@@ -572,15 +619,47 @@ export default function UnifiedDashboard() {
                                 >
                                   {checkingIn === request.appId
                                     ? 'Checking in...'
-                                    : request.daysTested >= 14
-                                    ? 'Test Complete!'
                                     : canCheckIn(request)
                                     ? 'I Tested Today'
                                     : 'Already checked in'}
                                 </button>
                               </div>
 
-                              {request.daysTested >= 14 && !request.rating && (
+                              {!request.bugReport && (
+                                <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+                                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                                    <span>🐛</span> Report a Bug
+                                  </h4>
+                                  <textarea
+                                    placeholder="Describe any bugs or issues you found..."
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3"
+                                    rows={3}
+                                    value={ratingData[request.id]?.bugReport || ''}
+                                    onChange={(e) => setRatingData({
+                                      ...ratingData,
+                                      [request.id]: { ...ratingData[request.id], bugReport: e.target.value }
+                                    })}
+                                  />
+                                  <button
+                                    onClick={() => submitBugReport(request.id)}
+                                    className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition"
+                                  >
+                                    Submit Bug Report
+                                  </button>
+                                </div>
+                              )}
+
+                              {request.bugReport && (
+                                <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-red-500">🐛</span>
+                                    <span className="text-sm font-medium text-red-700">Your Bug Report</span>
+                                  </div>
+                                  <p className="text-sm text-gray-700">{request.bugReport}</p>
+                                </div>
+                              )}
+
+                              {!request.rating && (
                                 <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
                                   <h4 className="font-medium text-gray-900 mb-3">Leave a Rating</h4>
                                   <div className="flex gap-2 mb-3">

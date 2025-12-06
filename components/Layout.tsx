@@ -78,28 +78,34 @@ export default function Layout({ children, title = 'Close Testing Group' }: Layo
           </div>
 
           {mobileMenuOpen && (
-            <div className="md:hidden mt-3 pt-3 border-t border-slate-100">
-              <div className="flex flex-col gap-1">
-                {navLinks.map((link) => {
-                  const isActive = router.pathname === link.href;
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-3 ${
-                        isActive
-                          ? 'bg-indigo-50 text-indigo-700'
-                          : 'text-slate-600 hover:text-indigo-600 hover:bg-slate-50'
-                      }`}
-                    >
-                      <span className="text-lg">{link.icon}</span>
-                      {link.label}
-                    </Link>
-                  );
-                })}
+            <>
+              <div 
+                className="md:hidden fixed inset-0 bg-black/20 z-40"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <div className="md:hidden absolute left-0 right-0 top-full bg-white shadow-lg border-t border-slate-100 z-50">
+                <div className="flex flex-col gap-1 p-3">
+                  {navLinks.map((link) => {
+                    const isActive = router.pathname === link.href;
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-3 ${
+                          isActive
+                            ? 'bg-indigo-50 text-indigo-700'
+                            : 'text-slate-600 hover:text-indigo-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        <span className="text-lg">{link.icon}</span>
+                        {link.label}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
       </nav>

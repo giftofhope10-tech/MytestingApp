@@ -40,22 +40,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'You have already checked in today. Come back tomorrow!' });
     }
 
-    if (requestData.daysTested >= 14) {
-      return res.status(400).json({ error: 'You have already completed the 14-day testing cycle!' });
-    }
-
     const newDaysTested = (requestData.daysTested || 0) + 1;
 
     await updateDoc(doc(db, 'testerRequests', requestDocId), {
       daysTested: newDaysTested,
       lastTestDate: today,
-      completedBadge: newDaysTested >= 14,
     });
 
     return res.status(200).json({ 
-      message: `Check-in successful! Day ${newDaysTested} of 14 completed.`,
+      message: `Check-in successful! Day ${newDaysTested} completed.`,
       daysTested: newDaysTested,
-      completed: newDaysTested >= 14,
     });
   } catch (error) {
     console.error('Error checking in:', error);

@@ -42,3 +42,22 @@ export interface Rating {
   feedback: string;
   createdAt: number;
 }
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  author: string;
+  status: 'draft' | 'published';
+  createdAt: number;
+  updatedAt: number;
+  publishedAt?: number;
+}
+
+export interface AdminUser {
+  email: string;
+  role: 'admin' | 'editor';
+  createdAt: number;
+}

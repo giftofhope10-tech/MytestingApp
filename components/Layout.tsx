@@ -36,9 +36,9 @@ export default function Layout({ children, title = 'Close Testing Group' }: Layo
               <Image 
                 src="/logo.png" 
                 alt="Close Testing Group" 
-                width={160} 
-                height={50} 
-                className="h-9 md:h-10 lg:h-12 w-auto object-contain"
+                width={200} 
+                height={60} 
+                className="h-12 md:h-14 lg:h-16 w-auto object-contain"
                 priority
               />
             </Link>
@@ -121,9 +121,9 @@ export default function Layout({ children, title = 'Close Testing Group' }: Layo
               <Image 
                 src="/logo.png" 
                 alt="Close Testing Group" 
-                width={120} 
-                height={40} 
-                className="h-8 w-auto object-contain"
+                width={160} 
+                height={50} 
+                className="h-10 w-auto object-contain"
               />
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-sm text-slate-400 text-center">

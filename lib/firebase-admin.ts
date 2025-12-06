@@ -7,19 +7,23 @@ function getFirebaseAdmin() {
     
     if (serviceAccount) {
       try {
-        const parsed = JSON.parse(serviceAccount);
+        let parsed = JSON.parse(serviceAccount);
+        
+        if (parsed.private_key) {
+          parsed.private_key = parsed.private_key.replace(/\\n/g, '\n');
+        }
+        
         initializeApp({
           credential: cert(parsed),
         });
+        console.log('Firebase Admin initialized with service account');
       } catch (error) {
-        initializeApp({
-          projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-        });
+        console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY:', error);
+        throw new Error('Invalid FIREBASE_SERVICE_ACCOUNT_KEY configuration');
       }
     } else {
-      initializeApp({
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      });
+      console.error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set');
+      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY is required');
     }
   }
   return getFirestore();

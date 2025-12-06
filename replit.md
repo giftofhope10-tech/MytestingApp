@@ -18,6 +18,15 @@ A web platform for managing Google Play closed testing programs. Developers can 
 │   ├── tester.tsx         # Tester dashboard with check-in
 │   ├── app/
 │   │   └── [appId].tsx    # App details and tester request
+│   ├── blog/
+│   │   ├── index.tsx      # Blog listing page
+│   │   └── [slug].tsx     # Individual blog post page
+│   ├── admin/
+│   │   ├── index.tsx      # Admin panel with session auth
+│   │   ├── users.tsx      # Admin user management
+│   │   └── blog/
+│   │       ├── new.tsx    # New blog post editor
+│   │       └── [id].tsx   # Edit blog post page
 │   └── api/
 │       ├── apps.ts        # GET/POST apps
 │       ├── apps/[appId].ts # GET/PATCH single app
@@ -25,7 +34,14 @@ A web platform for managing Google Play closed testing programs. Developers can 
 │       ├── verify-otp.ts  # Verify OTP code
 │       ├── tester-requests.ts    # GET/POST tester requests
 │       ├── tester-requests/[id].ts # PATCH request status
-│       └── check-in.ts    # Daily tester check-in
+│       ├── check-in.ts    # Daily tester check-in
+│       ├── blog/
+│       │   ├── index.ts   # Blog CRUD API
+│       │   └── [id].ts    # Individual blog API
+│       └── admin/
+│           ├── session.ts # Admin session management
+│           ├── check.ts   # Admin auth check
+│           └── add.ts     # Add new admin users
 ├── components/
 │   ├── Layout.tsx         # Main layout with navigation
 │   ├── AppCard.tsx        # App card display
@@ -36,6 +52,7 @@ A web platform for managing Google Play closed testing programs. Developers can 
 │   ├── firebase-admin.ts  # Firebase admin config
 │   ├── otp.ts             # OTP generation/verification
 │   ├── tempmail.ts        # Temporary email detection
+│   ├── session.ts         # Session management utilities
 │   └── types.ts           # TypeScript interfaces
 └── styles/
     └── globals.css        # Global styles with Tailwind
@@ -64,10 +81,20 @@ Add these in the Secrets tab:
 - Progress visualization
 - Rate apps after testing period
 
+### Admin Panel & Blog CMS
+- Admin authentication with OTP verification + session tokens
+- Create, edit, and delete blog posts
+- Rich text editor with title and content
+- Publish/draft status for blog posts
+- SEO-friendly URLs using slugs
+- Admin user management (add/remove admins)
+
 ### Security
 - OTP email verification for all users
 - Temporary email detection (blocks disposable emails)
-- Session management
+- Session-based authentication for admin panel
+- OTP verification required before session creation (5-minute window)
+- One-time use verification tokens
 
 ## Development
 

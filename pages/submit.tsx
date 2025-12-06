@@ -112,7 +112,7 @@ export default function SubmitApp() {
                 </div>
                 <h2 className="text-lg sm:text-xl font-semibold text-slate-900">Verify Your Email</h2>
                 <p className="text-slate-500 mt-2 text-sm sm:text-base">
-                  We'll send a code to confirm your identity.
+                  We&apos;ll send a code to confirm your identity.
                 </p>
               </div>
               <OTPVerification

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import Layout from '../../components/Layout';
 import OTPVerification from '../../components/OTPVerification';
 import ProgressBar from '../../components/ProgressBar';
@@ -17,19 +18,7 @@ export default function AppDetails() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  useEffect(() => {
-    if (appId) {
-      fetchApp();
-    }
-  }, [appId]);
-
-  useEffect(() => {
-    if (verified && email && appId) {
-      checkTesterRequest();
-    }
-  }, [verified, email, appId]);
-
-  const fetchApp = async () => {
+  const fetchApp = useCallback(async () => {
     try {
       const res = await fetch(`/api/apps/${appId}`);
       const data = await res.json();
@@ -41,9 +30,9 @@ export default function AppDetails() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [appId]);
 
-  const checkTesterRequest = async () => {
+  const checkTesterRequest = useCallback(async () => {
     try {
       const res = await fetch(`/api/tester-requests?testerEmail=${email}&appId=${appId}`);
       const data = await res.json();
@@ -54,7 +43,19 @@ export default function AppDetails() {
     } catch (error) {
       console.error('Failed to check request:', error);
     }
-  };
+  }, [email, appId]);
+
+  useEffect(() => {
+    if (appId) {
+      fetchApp();
+    }
+  }, [appId, fetchApp]);
+
+  useEffect(() => {
+    if (verified && email && appId) {
+      checkTesterRequest();
+    }
+  }, [verified, email, appId, checkTesterRequest]);
 
   const requestAccess = async () => {
     setSubmitting(true);
@@ -75,8 +76,9 @@ export default function AppDetails() {
 
       setMessage({ type: 'success', text: 'Request submitted! Wait for approval.' });
       checkTesterRequest();
-    } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || 'Failed to submit request' });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit request';
+      setMessage({ type: 'error', text: errorMessage });
     } finally {
       setSubmitting(false);
     }
@@ -114,7 +116,7 @@ export default function AppDetails() {
           <div className="flex items-start gap-4 sm:gap-6">
             <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-slate-100 to-slate-50 rounded-xl sm:rounded-2xl flex items-center justify-center overflow-hidden flex-shrink-0">
               {app.iconUrl && app.iconUrl !== '/default-icon.png' ? (
-                <img src={app.iconUrl} alt={app.name} className="w-full h-full object-cover" />
+                <Image src={app.iconUrl} alt={app.name} width={96} height={96} className="w-full h-full object-cover" unoptimized />
               ) : (
                 <span className="text-3xl sm:text-5xl">📱</span>
               )}

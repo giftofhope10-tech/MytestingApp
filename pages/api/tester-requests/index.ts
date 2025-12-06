@@ -44,9 +44,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       
       const snapshot = await getDocs(q!);
-      const requests: any[] = [];
+      const requests: object[] = [];
       snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
+        const data = docSnap.data() as Record<string, unknown>;
         requests.push({ id: docSnap.id, ...data });
       });
       

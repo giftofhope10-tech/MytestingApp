@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import Layout from '../components/Layout';
 import OTPVerification from '../components/OTPVerification';
 import ProgressBar from '../components/ProgressBar';
@@ -14,20 +15,7 @@ export default function DeveloperDashboard() {
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (router.query.email) {
-      setEmail(router.query.email as string);
-      setVerified(true);
-    }
-  }, [router.query]);
-
-  useEffect(() => {
-    if (verified && email) {
-      fetchData();
-    }
-  }, [verified, email]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [appsRes, requestsRes] = await Promise.all([
@@ -46,7 +34,20 @@ export default function DeveloperDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [email]);
+
+  useEffect(() => {
+    if (router.query.email) {
+      setEmail(router.query.email as string);
+      setVerified(true);
+    }
+  }, [router.query]);
+
+  useEffect(() => {
+    if (verified && email) {
+      fetchData();
+    }
+  }, [verified, email, fetchData]);
 
   const handleRequest = async (requestId: string, status: 'approved' | 'rejected') => {
     setUpdating(requestId);
@@ -141,7 +142,7 @@ export default function DeveloperDashboard() {
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
                       {app.iconUrl && app.iconUrl !== '/default-icon.png' ? (
-                        <img src={app.iconUrl} alt={app.name} className="w-full h-full object-cover" />
+                        <Image src={app.iconUrl} alt={app.name} width={64} height={64} className="w-full h-full object-cover" unoptimized />
                       ) : (
                         <div className="text-2xl">📱</div>
                       )}
@@ -232,7 +233,7 @@ export default function DeveloperDashboard() {
                               <span className="text-yellow-400">★</span>
                               <span className="text-sm font-medium">{request.rating}/5</span>
                               {request.feedback && (
-                                <span className="text-sm text-gray-500">- "{request.feedback}"</span>
+                                <span className="text-sm text-gray-500">- &quot;{request.feedback}&quot;</span>
                               )}
                             </div>
                           )}

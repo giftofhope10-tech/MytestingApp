@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import Image from 'next/image';
 import Layout from '../components/Layout';
 import OTPVerification from '../components/OTPVerification';
 import ProgressBar from '../components/ProgressBar';
@@ -17,20 +18,7 @@ export default function TesterDashboard() {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [ratingData, setRatingData] = useState<Record<string, { rating: number; feedback: string }>>({});
 
-  useEffect(() => {
-    if (router.query.email) {
-      setEmail(router.query.email as string);
-      setVerified(true);
-    }
-  }, [router.query]);
-
-  useEffect(() => {
-    if (verified && email) {
-      fetchData();
-    }
-  }, [verified, email]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const requestsRes = await fetch(`/api/tester-requests?testerEmail=${email}`);
@@ -49,7 +37,20 @@ export default function TesterDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [email]);
+
+  useEffect(() => {
+    if (router.query.email) {
+      setEmail(router.query.email as string);
+      setVerified(true);
+    }
+  }, [router.query]);
+
+  useEffect(() => {
+    if (verified && email) {
+      fetchData();
+    }
+  }, [verified, email, fetchData]);
 
   const checkIn = async (appId: string) => {
     setCheckingIn(appId);
@@ -70,14 +71,15 @@ export default function TesterDashboard() {
 
       setMessage({ type: 'success', text: data.message });
       fetchData();
-    } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || 'Failed to check in' });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to check in';
+      setMessage({ type: 'error', text: errorMessage });
     } finally {
       setCheckingIn(null);
     }
   };
 
-  const submitRating = async (requestId: string, appId: string) => {
+  const submitRating = async (requestId: string) => {
     const data = ratingData[requestId];
     if (!data?.rating) {
       setMessage({ type: 'error', text: 'Please select a rating' });
@@ -101,8 +103,9 @@ export default function TesterDashboard() {
 
       setMessage({ type: 'success', text: 'Rating submitted successfully!' });
       fetchData();
-    } catch (error: any) {
-      setMessage({ type: 'error', text: error.message });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit rating';
+      setMessage({ type: 'error', text: errorMessage });
     }
   };
 
@@ -199,7 +202,7 @@ export default function TesterDashboard() {
                         <div className="flex items-start gap-4 mb-4">
                           <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
                             {app.iconUrl && app.iconUrl !== '/default-icon.png' ? (
-                              <img src={app.iconUrl} alt={app.name} className="w-full h-full object-cover" />
+                              <Image src={app.iconUrl} alt={app.name} width={64} height={64} className="w-full h-full object-cover" unoptimized />
                             ) : (
                               <div className="text-2xl">📱</div>
                             )}
@@ -273,7 +276,7 @@ export default function TesterDashboard() {
                               })}
                             />
                             <button
-                              onClick={() => submitRating(request.id, request.appId)}
+                              onClick={() => submitRating(request.id)}
                               className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
                             >
                               Submit Rating
@@ -289,7 +292,7 @@ export default function TesterDashboard() {
                               <span className="text-sm text-gray-600">Your rating</span>
                             </div>
                             {request.feedback && (
-                              <p className="text-sm text-gray-600 mt-2">"{request.feedback}"</p>
+                              <p className="text-sm text-gray-600 mt-2">&quot;{request.feedback}&quot;</p>
                             )}
                           </div>
                         )}
@@ -313,7 +316,7 @@ export default function TesterDashboard() {
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
                             {app.iconUrl && app.iconUrl !== '/default-icon.png' ? (
-                              <img src={app.iconUrl} alt={app.name} className="w-full h-full object-cover" />
+                              <Image src={app.iconUrl} alt={app.name} width={48} height={48} className="w-full h-full object-cover" unoptimized />
                             ) : (
                               <div className="text-xl">📱</div>
                             )}

@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
     "*.replit.dev",
     "*.repl.co",
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
   async headers() {
     return [
       {

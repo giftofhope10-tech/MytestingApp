@@ -1,0 +1,168 @@
+import { useState } from 'react';
+
+interface OTPVerificationProps {
+  email: string;
+  onVerified: () => void;
+  onEmailChange: (email: string) => void;
+}
+
+export default function OTPVerification({ email, onVerified, onEmailChange }: OTPVerificationProps) {
+  const [step, setStep] = useState<'email' | 'otp'>('email');
+  const [otp, setOtp] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const sendOTP = async () => {
+    if (!email) {
+      setError('Please enter your email');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error);
+      }
+
+      setSuccess('OTP sent to your email!');
+      setStep('otp');
+    } catch (err: any) {
+      setError(err.message || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyOTP = async () => {
+    if (!otp || otp.length !== 6) {
+      setError('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: otp }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message);
+      }
+
+      setSuccess('Email verified successfully!');
+      onVerified();
+    } catch (err: any) {
+      setError(err.message || 'Failed to verify OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3 sm:space-y-4">
+      {step === 'email' ? (
+        <>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => onEmailChange(e.target.value)}
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm sm:text-base"
+              placeholder="your@email.com"
+            />
+          </div>
+          <button
+            onClick={sendOTP}
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-medium shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/60 disabled:opacity-50 transition-all text-sm sm:text-base"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                Sending...
+              </span>
+            ) : (
+              'Send Verification Code →'
+            )}
+          </button>
+        </>
+      ) : (
+        <>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">
+              Verification Code
+            </label>
+            <input
+              type="text"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              className="w-full px-3 sm:px-4 py-3 sm:py-4 border border-slate-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-center text-xl sm:text-2xl tracking-[0.3em] sm:tracking-[0.5em] font-mono transition-all"
+              placeholder="------"
+              maxLength={6}
+            />
+            <p className="text-xs sm:text-sm text-slate-500 mt-1.5 sm:mt-2 text-center">
+              Enter the 6-digit code sent to <strong className="text-slate-700 break-all">{email}</strong>
+            </p>
+          </div>
+          <button
+            onClick={verifyOTP}
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 sm:py-3.5 rounded-lg sm:rounded-xl font-medium shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/60 disabled:opacity-50 transition-all text-sm sm:text-base"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                Verifying...
+              </span>
+            ) : (
+              'Verify Code →'
+            )}
+          </button>
+          <button
+            onClick={() => {
+              setStep('email');
+              setOtp('');
+              setError('');
+            }}
+            className="w-full text-slate-500 py-2 hover:text-indigo-600 font-medium transition-colors text-sm"
+          >
+            ← Change Email
+          </button>
+        </>
+      )}
+
+      {error && (
+        <div className="p-3 sm:p-4 bg-red-50 border border-red-100 text-red-600 rounded-lg sm:rounded-xl text-xs sm:text-sm flex items-center gap-2">
+          <span>⚠️</span>
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="p-3 sm:p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-lg sm:rounded-xl text-xs sm:text-sm flex items-center gap-2">
+          <span>✅</span>
+          {success}
+        </div>
+      )}
+    </div>
+  );
+}

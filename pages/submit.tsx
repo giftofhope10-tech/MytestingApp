@@ -22,6 +22,7 @@ export default function SubmitApp() {
   const handleVerified = () => {
     setVerified(true);
     setStep('form');
+    localStorage.setItem('userEmail', email.toLowerCase());
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -59,7 +60,7 @@ export default function SubmitApp() {
         throw new Error(data.error);
       }
 
-      router.push(`/developer?email=${encodeURIComponent(email)}`);
+      router.push(`/dashboard?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       setError(err.message || 'Failed to submit app');
     } finally {

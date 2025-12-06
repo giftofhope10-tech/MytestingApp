@@ -19,6 +19,9 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
       return;
     }
 
+    const normalizedEmail = email.toLowerCase();
+    onEmailChange(normalizedEmail);
+
     setLoading(true);
     setError('');
 
@@ -26,7 +29,7 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
       const checkRes = await fetch('/api/check-verified', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: normalizedEmail }),
       });
 
       const checkData = await checkRes.json();
@@ -40,7 +43,7 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
       const res = await fetch('/api/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: normalizedEmail }),
       });
 
       const data = await res.json();
@@ -64,6 +67,8 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
       return;
     }
 
+    const normalizedEmail = email.toLowerCase();
+
     setLoading(true);
     setError('');
 
@@ -71,7 +76,7 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
       const res = await fetch('/api/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code: otp }),
+        body: JSON.stringify({ email: normalizedEmail, code: otp }),
       });
 
       const data = await res.json();

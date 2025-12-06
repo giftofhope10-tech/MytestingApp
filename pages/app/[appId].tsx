@@ -53,6 +53,11 @@ export default function AppDetails() {
     if (appId) {
       fetchApp();
     }
+    const savedEmail = localStorage.getItem('userEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setVerified(true);
+    }
   }, [appId, fetchApp]);
 
   useEffect(() => {
@@ -168,7 +173,10 @@ export default function AppDetails() {
               <OTPVerification
                 email={email}
                 onEmailChange={setEmail}
-                onVerified={() => setVerified(true)}
+                onVerified={() => {
+                  localStorage.setItem('userEmail', email.toLowerCase());
+                  setVerified(true);
+                }}
               />
             </div>
           ) : testerRequest ? (
@@ -216,8 +224,8 @@ export default function AppDetails() {
 
                   <p className="text-xs sm:text-sm text-slate-500 text-center">
                     Visit your{' '}
-                    <a href={`/tester?email=${email}`} className="text-indigo-600 font-medium hover:underline">
-                      Tester Dashboard
+                    <a href={`/dashboard?tab=tester`} className="text-indigo-600 font-medium hover:underline">
+                      Dashboard
                     </a>{' '}
                     for daily check-in.
                   </p>

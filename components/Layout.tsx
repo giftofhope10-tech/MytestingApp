@@ -16,8 +16,7 @@ export default function Layout({ children, title = 'Close Testing Group' }: Layo
   const navLinks = [
     { href: '/', label: 'Apps', icon: '🎯' },
     { href: '/submit', label: 'Submit App', icon: '📤' },
-    { href: '/developer', label: 'Developer', icon: '💻' },
-    { href: '/tester', label: 'Tester', icon: '🧪' },
+    { href: '/dashboard', label: 'Dashboard', icon: '👤' },
     { href: '/about', label: 'About', icon: '📖' },
   ];
 

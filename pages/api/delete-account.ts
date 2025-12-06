@@ -12,40 +12,41 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Email is required' });
   }
 
+  if (!type || !['developer', 'tester', 'both'].includes(type)) {
+    return res.status(400).json({ error: 'Invalid type' });
+  }
+
   const normalizedEmail = email.toLowerCase();
 
   try {
     const db = adminDb;
+    const batch = db.batch();
+    const deletedTesterRequestIds = new Set<string>();
 
-    if (type === 'developer') {
-      const appsSnapshot = await db.collection('apps').where('developerEmail', '==', email).get();
+    if (type === 'developer' || type === 'both') {
+      const appsSnapshot = await db.collection('apps').where('developerEmail', '==', normalizedEmail).get();
       
       const hasActiveApps = appsSnapshot.docs.some(doc => doc.data().status === 'active');
       if (hasActiveApps) {
         return res.status(400).json({ error: 'Cannot delete account with active testing polls' });
       }
 
-      const batch = db.batch();
-      
       for (const doc of appsSnapshot.docs) {
         const requestsSnapshot = await db.collection('testerRequests').where('appId', '==', doc.data().appId).get();
-        requestsSnapshot.docs.forEach(reqDoc => batch.delete(reqDoc.ref));
+        requestsSnapshot.docs.forEach(reqDoc => {
+          if (!deletedTesterRequestIds.has(reqDoc.id)) {
+            batch.delete(reqDoc.ref);
+            deletedTesterRequestIds.add(reqDoc.id);
+          }
+        });
         batch.delete(doc.ref);
       }
+    }
 
-      const otpDoc = db.collection('otps').doc(normalizedEmail);
-      const otpSnapshot = await otpDoc.get();
-      if (otpSnapshot.exists) batch.delete(otpDoc);
-
-      const verifiedDoc = db.collection('verifiedEmails').doc(normalizedEmail);
-      const verifiedSnapshot = await verifiedDoc.get();
-      if (verifiedSnapshot.exists) batch.delete(verifiedDoc);
-
-      await batch.commit();
-    } else if (type === 'tester') {
-      const requestsSnapshot = await db.collection('testerRequests').where('testerEmail', '==', email).get();
+    if (type === 'tester' || type === 'both') {
+      const testerRequestsSnapshot = await db.collection('testerRequests').where('testerEmail', '==', normalizedEmail).get();
       
-      const hasActiveTesting = requestsSnapshot.docs.some(doc => {
+      const hasActiveTesting = testerRequestsSnapshot.docs.some(doc => {
         const data = doc.data();
         return data.status === 'approved' && data.daysTested < 14;
       });
@@ -54,19 +55,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Cannot delete account with active testing in progress' });
       }
 
-      const batch = db.batch();
-      requestsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
-
-      const otpDoc = db.collection('otps').doc(normalizedEmail);
-      const otpSnapshot = await otpDoc.get();
-      if (otpSnapshot.exists) batch.delete(otpDoc);
-
-      const verifiedDoc = db.collection('verifiedEmails').doc(normalizedEmail);
-      const verifiedSnapshot = await verifiedDoc.get();
-      if (verifiedSnapshot.exists) batch.delete(verifiedDoc);
-
-      await batch.commit();
+      testerRequestsSnapshot.docs.forEach(doc => {
+        if (!deletedTesterRequestIds.has(doc.id)) {
+          batch.delete(doc.ref);
+          deletedTesterRequestIds.add(doc.id);
+        }
+      });
     }
+
+    const otpDoc = db.collection('otps').doc(normalizedEmail);
+    const otpSnapshot = await otpDoc.get();
+    if (otpSnapshot.exists) batch.delete(otpDoc);
+
+    const verifiedDoc = db.collection('verifiedEmails').doc(normalizedEmail);
+    const verifiedSnapshot = await verifiedDoc.get();
+    if (verifiedSnapshot.exists) batch.delete(verifiedDoc);
+
+    await batch.commit();
 
     return res.status(200).json({ message: 'Account deleted successfully' });
   } catch (error) {

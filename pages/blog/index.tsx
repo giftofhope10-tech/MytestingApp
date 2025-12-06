@@ -25,6 +25,55 @@ const staticBlogs = [
     date: 'December 6, 2025',
     isStatic: true,
   },
+  {
+    slug: 'closed-testing-vs-open-testing',
+    title: 'Closed Testing vs Open Testing – A Complete Developer Guide',
+    excerpt: 'Google Play Console developers ko do major testing options deta hai: Closed Testing aur Open Testing. Is guide me hum in dono ko detail me samjheinge.',
+    date: 'December 6, 2025',
+    isStatic: true,
+  },
+  {
+    slug: 'common-app-testing-mistakes',
+    title: 'Common App Testing Mistakes – A Complete 1000-Word Developer Guide',
+    excerpt: 'App testing ek technical process hi nahi, balke ek mindset hota hai. Is blog me hum sabse common testing mistakes aur unke professional solutions ko explain kareinge.',
+    date: 'December 6, 2025',
+    isStatic: true,
+  },
+  {
+    slug: 'app-performance-testing-importance',
+    title: 'Why App Performance Testing Is Important – Complete 1000+ Word Guide',
+    excerpt: 'App performance testing ensure karti hai ke app har situation me fast, stable aur responsive rahe. Is guide me hum performance testing ko deep me samjheinge.',
+    date: 'December 6, 2025',
+    isStatic: true,
+  },
+  {
+    slug: 'network-testing-app-performance',
+    title: 'The Importance of Network Testing in App Performance – Full 1000+ Word Guide',
+    excerpt: 'Network testing app development ka wo hissa hai jise bohat kam developers seriously lete hain. Is guide me hum network testing ko deep me cover karenge.',
+    date: 'December 6, 2025',
+    isStatic: true,
+  },
+  {
+    slug: 'ui-ux-testing-modern-apps',
+    title: 'Why UI/UX Testing Matters in Modern App Development – Full 1000+ Word Guide',
+    excerpt: 'UI/UX testing modern app development ka wo step hai jise ignore karna almost impossible ho chuka hai. Is guide me hum detail me samjheinge ke UI/UX testing kya hoti hai.',
+    date: 'December 6, 2025',
+    isStatic: true,
+  },
+  {
+    slug: 'security-testing-app-development',
+    title: 'The Importance of Security Testing in App Development – Full 1000+ Word Guide',
+    excerpt: 'Security testing app development ka ek crucial hissa hai jise ignore karna kisi bhi developer ke liye bohot risky ho sakta hai.',
+    date: 'December 6, 2025',
+    isStatic: true,
+  },
+  {
+    slug: 'compatibility-testing-app-success',
+    title: 'Why Compatibility Testing is Critical for App Success – Complete 1000+ Word Guide',
+    excerpt: 'Compatibility testing app development ka wo essential step hai jo ensure karta hai ke aapki app har device, har OS, aur har environment me perfect tarike se kaam kare.',
+    date: 'December 6, 2025',
+    isStatic: true,
+  },
 ];
 
 export default function BlogIndex() {

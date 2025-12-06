@@ -1,17 +1,62 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface OTPVerificationProps {
   email: string;
   onVerified: () => void;
   onEmailChange: (email: string) => void;
+  storageKey?: string;
 }
 
-export default function OTPVerification({ email, onVerified, onEmailChange }: OTPVerificationProps) {
+export default function OTPVerification({ email, onVerified, onEmailChange, storageKey = 'otpVerification' }: OTPVerificationProps) {
   const [step, setStep] = useState<'email' | 'otp'>('email');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [initialized, setInitialized] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+        if (data.timestamp && data.timestamp > fiveMinutesAgo) {
+          if (data.email) {
+            onEmailChange(data.email);
+          }
+          if (data.step === 'otp') {
+            setStep('otp');
+          }
+        } else {
+          localStorage.removeItem(storageKey);
+        }
+      } catch (e) {
+        localStorage.removeItem(storageKey);
+      }
+    }
+    setInitialized(true);
+  }, [storageKey, onEmailChange]);
+
+  useEffect(() => {
+    if (initialized && step === 'otp' && email) {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify({
+          email,
+          step,
+          timestamp: Date.now()
+        }));
+      } catch (e) {
+      }
+    }
+  }, [step, email, storageKey, initialized]);
+
+  const clearStorage = () => {
+    try {
+      localStorage.removeItem(storageKey);
+    } catch (e) {
+    }
+  };
 
   const checkAndVerify = async () => {
     if (!email) {
@@ -36,6 +81,7 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
 
       if (checkRes.ok && checkData.verified) {
         setSuccess('Email already verified! Logging in...');
+        clearStorage();
         setTimeout(() => onVerified(), 500);
         return;
       }
@@ -86,6 +132,7 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
       }
 
       setSuccess('Email verified successfully!');
+      clearStorage();
       onVerified();
     } catch (err: any) {
       setError(err.message || 'Failed to verify OTP');
@@ -162,6 +209,7 @@ export default function OTPVerification({ email, onVerified, onEmailChange }: OT
               setStep('email');
               setOtp('');
               setError('');
+              clearStorage();
             }}
             className="w-full text-slate-500 py-2 hover:text-indigo-600 font-medium transition-colors text-sm"
           >

@@ -160,12 +160,33 @@ export default function AppDetails() {
         </div>
 
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 p-5 sm:p-8">
-          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2">
-            <span className="text-base sm:text-lg">🧪</span>
-            Request Access
-          </h2>
+          {app.status === 'completed' ? (
+            <div className="text-center py-4 sm:py-6">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-100 rounded-2xl mx-auto flex items-center justify-center mb-4">
+                <span className="text-3xl sm:text-4xl">✅</span>
+              </div>
+              <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">Testing Completed</h2>
+              <p className="text-slate-500 text-sm sm:text-base">
+                This app has completed its testing phase. No new testers are being accepted.
+              </p>
+              <div className="mt-4 sm:mt-6 p-4 bg-slate-50 rounded-xl">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-amber-500">★</span>
+                  <span className="font-semibold text-slate-700">
+                    Final Rating: {app.rating > 0 ? app.rating.toFixed(1) : 'N/A'}
+                  </span>
+                  <span className="text-slate-400 text-sm">({app.totalRatings} testers)</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2">
+                <span className="text-base sm:text-lg">🧪</span>
+                Request Access
+              </h2>
 
-          {!verified ? (
+              {!verified ? (
             <div className="space-y-4">
               <p className="text-slate-500 text-sm sm:text-base">
                 Verify your email to request testing access.
@@ -256,15 +277,17 @@ export default function AppDetails() {
             </div>
           )}
 
-          {message.text && (
-            <div className={`mt-4 sm:mt-5 p-3 sm:p-4 rounded-lg sm:rounded-xl text-xs sm:text-sm flex items-center gap-2 ${
-              message.type === 'success'
-                ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                : 'bg-red-50 text-red-700 border border-red-100'
-            }`}>
-              <span>{message.type === 'success' ? '✅' : '⚠️'}</span>
-              {message.text}
-            </div>
+              {message.text && (
+                <div className={`mt-4 sm:mt-5 p-3 sm:p-4 rounded-lg sm:rounded-xl text-xs sm:text-sm flex items-center gap-2 ${
+                  message.type === 'success'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                    : 'bg-red-50 text-red-700 border border-red-100'
+                }`}>
+                  <span>{message.type === 'success' ? '✅' : '⚠️'}</span>
+                  {message.text}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

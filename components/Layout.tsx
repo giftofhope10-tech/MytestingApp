@@ -27,7 +27,7 @@ export default function Layout({ children, title = 'Close Testing Group' }: Layo
         <title>{title}</title>
         <meta name="description" content="Professional platform for Google Play closed testing programs" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/logo.webp" />
+        <link rel="icon" href="/logo.png" />
       </Head>
 
       <nav className="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50">
@@ -35,11 +35,11 @@ export default function Layout({ children, title = 'Close Testing Group' }: Layo
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
               <Image 
-                src="/logo.webp" 
+                src="/logo.png" 
                 alt="Close Testing Group" 
                 width={160} 
                 height={50} 
-                className="h-10 sm:h-12 w-auto object-contain"
+                className="h-9 md:h-10 lg:h-12 w-auto object-contain"
                 priority
               />
             </Link>
@@ -114,7 +114,7 @@ export default function Layout({ children, title = 'Close Testing Group' }: Layo
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Image 
-                src="/logo.webp" 
+                src="/logo.png" 
                 alt="Close Testing Group" 
                 width={120} 
                 height={40} 

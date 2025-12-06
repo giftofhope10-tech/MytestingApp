@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
-import OTPVerification from '../../components/OTPVerification';
 import type { BlogPost } from '../../lib/types';
 
 export default function AdminPanel() {
-  const [email, setEmail] = useState('');
   const [verified, setVerified] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminRole, setAdminRole] = useState('');
@@ -13,7 +11,6 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [error, setError] = useState('');
-  const [loginMethod, setLoginMethod] = useState<'email' | 'token'>('email');
   const [adminToken, setAdminToken] = useState('');
   const [tokenLoading, setTokenLoading] = useState(false);
 
@@ -28,55 +25,23 @@ export default function AdminPanel() {
 
   const validateExistingSession = async (token: string) => {
     try {
-      const res = await fetch('/api/admin/session', {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${token}` },
+      const res = await fetch('/api/admin/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionToken: token }),
       });
       
       if (res.ok) {
-        const data = await res.json();
-        setEmail(data.email);
-        setAdminRole(data.role);
         setSessionToken(token);
         setIsAdmin(true);
         setVerified(true);
+        setAdminRole('admin');
         fetchBlogs(token);
       } else {
         localStorage.removeItem('adminSessionToken');
       }
     } catch (err) {
       localStorage.removeItem('adminSessionToken');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createSession = async (userEmail: string) => {
-    setLoading(true);
-    setError('');
-    
-    try {
-      const res = await fetch('/api/admin/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail }),
-      });
-      const data = await res.json();
-      
-      if (res.ok && data.token) {
-        setSessionToken(data.token);
-        setAdminRole(data.role);
-        setEmail(data.email);
-        setIsAdmin(true);
-        setVerified(true);
-        localStorage.setItem('adminSessionToken', data.token);
-        fetchBlogs(data.token);
-      } else {
-        setError(data.error || 'You are not authorized to access the admin panel');
-        setIsAdmin(false);
-      }
-    } catch (err) {
-      setError('Failed to create session');
     } finally {
       setLoading(false);
     }
@@ -94,10 +59,6 @@ export default function AdminPanel() {
     } catch (err) {
       console.error('Failed to fetch blogs:', err);
     }
-  };
-
-  const handleVerified = () => {
-    createSession(email);
   };
 
   const handleTokenLogin = async (e: React.FormEvent) => {
@@ -120,7 +81,6 @@ export default function AdminPanel() {
         setIsAdmin(true);
         setVerified(true);
         setAdminRole('admin');
-        setEmail('Token Admin');
         fetchBlogs(data.sessionToken);
       } else {
         setError(data.error || 'Invalid admin token');
@@ -156,17 +116,7 @@ export default function AdminPanel() {
   };
 
   const handleLogout = async () => {
-    try {
-      await fetch('/api/admin/session', {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${sessionToken}` },
-      });
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-    
     localStorage.removeItem('adminSessionToken');
-    setEmail('');
     setVerified(false);
     setIsAdmin(false);
     setSessionToken('');
@@ -187,74 +137,54 @@ export default function AdminPanel() {
     return (
       <Layout title="Admin Panel - Close Testing Group">
         <div className="max-w-md mx-auto">
-          <h1 className="text-2xl font-bold text-center mb-6">Admin Login</h1>
-          
-          {/* Login Method Toggle */}
-          <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => { setLoginMethod('email'); setError(''); }}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
-                loginMethod === 'email'
-                  ? 'bg-white shadow text-indigo-600'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Email Verification
-            </button>
-            <button
-              onClick={() => { setLoginMethod('token'); setError(''); }}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
-                loginMethod === 'token'
-                  ? 'bg-white shadow text-indigo-600'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Admin Token
-            </button>
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl mx-auto flex items-center justify-center mb-4">
+              <span className="text-3xl">🔐</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Admin Login</h1>
+            <p className="text-gray-500 mt-2">Enter your admin token to continue</p>
           </div>
 
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
               {error}
             </div>
           )}
 
-          {loginMethod === 'email' ? (
-            <OTPVerification
-              email={email}
-              onEmailChange={setEmail}
-              onVerified={handleVerified}
-            />
-          ) : (
-            <form onSubmit={handleTokenLogin} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-              <div className="mb-4">
-                <label htmlFor="adminToken" className="block text-sm font-medium text-gray-700 mb-2">
-                  Admin Token
-                </label>
-                <input
-                  id="adminToken"
-                  type="password"
-                  value={adminToken}
-                  onChange={(e) => setAdminToken(e.target.value)}
-                  placeholder="Enter your admin token"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  required
-                  minLength={32}
-                  maxLength={64}
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  Enter the 32-character admin token
-                </p>
-              </div>
-              <button
-                type="submit"
-                disabled={tokenLoading || adminToken.length < 32}
-                className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-              >
-                {tokenLoading ? 'Authenticating...' : 'Login with Token'}
-              </button>
-            </form>
-          )}
+          <form onSubmit={handleTokenLogin} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div className="mb-4">
+              <label htmlFor="adminToken" className="block text-sm font-medium text-gray-700 mb-2">
+                Admin Token
+              </label>
+              <input
+                id="adminToken"
+                type="password"
+                value={adminToken}
+                onChange={(e) => setAdminToken(e.target.value)}
+                placeholder="Enter your admin token"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                required
+                minLength={32}
+                maxLength={64}
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Enter the 32-character admin token
+              </p>
+            </div>
+            <button
+              type="submit"
+              disabled={tokenLoading || adminToken.length < 32}
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              {tokenLoading ? 'Authenticating...' : 'Login'}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <Link href="/" className="text-sm text-gray-500 hover:text-indigo-600 transition">
+              ← Back to Home
+            </Link>
+          </div>
         </div>
       </Layout>
     );
@@ -267,7 +197,7 @@ export default function AdminPanel() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Admin Panel</h1>
             <p className="text-gray-600 mt-1">
-              Logged in as: {email} ({adminRole})
+              Logged in as: Admin
             </p>
           </div>
           <div className="flex gap-3">
@@ -340,19 +270,17 @@ export default function AdminPanel() {
           )}
         </div>
 
-        {adminRole === 'admin' && (
-          <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Admin Management</h2>
-            <p className="text-gray-600 mb-4">
-              As a super admin, you can add new editors to manage blog content.
-            </p>
-            <Link href="/admin/users">
-              <button className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition">
-                Manage Admins
-              </button>
-            </Link>
-          </div>
-        )}
+        <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Admin Management</h2>
+          <p className="text-gray-600 mb-4">
+            Manage admin users and permissions.
+          </p>
+          <Link href="/admin/users">
+            <button className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition">
+              Manage Admins
+            </button>
+          </Link>
+        </div>
       </div>
     </Layout>
   );

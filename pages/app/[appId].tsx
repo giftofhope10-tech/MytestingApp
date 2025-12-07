@@ -221,15 +221,27 @@ export default function AppDetails() {
                     {testerRequest.status === 'pending' && 'Waiting for Approval'}
                   </p>
                   <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                    {testerRequest.status === 'approved' && 'You can now test this app'}
+                    {testerRequest.status === 'approved' && 'Your email has been added to the closed testing list'}
                     {testerRequest.status === 'rejected' && 'Developer declined your request'}
-                    {testerRequest.status === 'pending' && 'Developer will review soon'}
+                    {testerRequest.status === 'pending' && 'Developer will add your email to closed testing list soon'}
                   </p>
                 </div>
               </div>
 
               {testerRequest.status === 'approved' && (
                 <>
+                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl sm:rounded-2xl p-4 sm:p-5">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl sm:text-3xl">🎉</span>
+                      <div>
+                        <h3 className="font-semibold text-emerald-800 text-sm sm:text-base">Your email has been added for testing!</h3>
+                        <p className="text-emerald-700 text-xs sm:text-sm mt-1">
+                          You can test this app for <strong>14 days</strong>. Thank you for becoming a tester!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   <a
                     href={app.playLink}
                     target="_blank"

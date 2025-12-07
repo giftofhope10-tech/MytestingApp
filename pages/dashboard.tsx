@@ -455,24 +455,29 @@ export default function UnifiedDashboard() {
                           <h4 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">Pending Requests</h4>
                           <div className="space-y-2">
                             {pendingRequests.map((request) => (
-                              <div key={request.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                <span className="text-gray-700 text-sm truncate">{request.testerEmail}</span>
-                                <div className="flex gap-2 flex-shrink-0">
-                                  <button
-                                    onClick={() => handleRequest(request.id, 'approved')}
-                                    disabled={updating === request.id}
-                                    className="flex-1 sm:flex-none bg-green-600 text-white px-3 sm:px-4 py-1.5 sm:py-1 rounded-lg hover:bg-green-700 disabled:opacity-50 text-xs sm:text-sm"
-                                  >
-                                    Approve
-                                  </button>
-                                  <button
-                                    onClick={() => handleRequest(request.id, 'rejected')}
-                                    disabled={updating === request.id}
-                                    className="flex-1 sm:flex-none bg-red-600 text-white px-3 sm:px-4 py-1.5 sm:py-1 rounded-lg hover:bg-red-700 disabled:opacity-50 text-xs sm:text-sm"
-                                  >
-                                    Reject
-                                  </button>
+                              <div key={request.id} className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                                  <span className="text-gray-700 text-sm truncate">{request.testerEmail}</span>
+                                  <div className="flex gap-2 flex-shrink-0">
+                                    <button
+                                      onClick={() => handleRequest(request.id, 'approved')}
+                                      disabled={updating === request.id}
+                                      className="flex-1 sm:flex-none bg-green-600 text-white px-3 sm:px-4 py-1.5 sm:py-1 rounded-lg hover:bg-green-700 disabled:opacity-50 text-xs sm:text-sm"
+                                    >
+                                      Add to Testing
+                                    </button>
+                                    <button
+                                      onClick={() => handleRequest(request.id, 'rejected')}
+                                      disabled={updating === request.id}
+                                      className="flex-1 sm:flex-none bg-red-600 text-white px-3 sm:px-4 py-1.5 sm:py-1 rounded-lg hover:bg-red-700 disabled:opacity-50 text-xs sm:text-sm"
+                                    >
+                                      Reject
+                                    </button>
+                                  </div>
                                 </div>
+                                <p className="text-xs text-yellow-700 mt-2">
+                                  Approving will add this email to your closed testing list for 14 days
+                                </p>
                               </div>
                             ))}
                           </div>
@@ -570,6 +575,17 @@ export default function UnifiedDashboard() {
                   {approvedTesterRequests.length > 0 && (
                     <div>
                       <h2 className="text-lg font-semibold text-gray-900 mb-4">Active Tests</h2>
+                      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-4 mb-4">
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl">🎉</span>
+                          <div>
+                            <h4 className="font-semibold text-emerald-800">You're an approved tester!</h4>
+                            <p className="text-emerald-700 text-sm mt-1">
+                              Your email has been added to the closed testing list. You can test for <strong>14 days</strong>. Thanks for testing!
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                       <div className="space-y-4">
                         {approvedTesterRequests.map((request) => {
                           const app = allApps[request.appId];
@@ -599,7 +615,7 @@ export default function UnifiedDashboard() {
                               <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-200 mb-4">
                                 <div className="flex items-center justify-between">
                                   <span className="text-sm text-indigo-700 font-medium">Days Tested</span>
-                                  <span className="text-lg font-bold text-indigo-600">{request.daysTested}</span>
+                                  <span className="text-lg font-bold text-indigo-600">{request.daysTested} / 14</span>
                                 </div>
                               </div>
 
@@ -738,7 +754,7 @@ export default function UnifiedDashboard() {
                                 </div>
                                 <div className="flex-1">
                                   <h3 className="font-medium text-gray-900">{app.name}</h3>
-                                  <p className="text-sm text-yellow-600">Waiting for developer approval</p>
+                                  <p className="text-sm text-yellow-600">Waiting for developer to add your email to closed testing list</p>
                                 </div>
                               </div>
                             </div>

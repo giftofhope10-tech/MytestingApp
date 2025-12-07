@@ -79,6 +79,25 @@ A web platform for managing Google Play closed testing programs. Developers can 
 - Token-based authentication (no email required)
 - Blog post management (create/edit/delete)
 - User management
+- AdSense ad management
+
+### Google AdSense Integration
+- **Admin Page**: `/auth/ads` - Configure ad settings
+- **Component**: `components/AdSense.tsx` - Reusable ad components
+- **API**: `pages/api/settings/ads.ts` - GET/PUT settings endpoint
+
+#### Ad Slots
+- Header ads (below navigation)
+- Footer ads (above footer)
+- Sidebar ads (app detail, blog pages)
+- In-article ads (blog posts)
+
+#### Setup
+1. Go to `/auth/ads` as admin
+2. Enable ads toggle
+3. Enter AdSense Client ID (ca-pub-XXXX)
+4. Enter slot IDs for each ad placement
+5. Save settings
 
 ### SEO (Comprehensive - 100+ Keywords)
 - **Configuration**: `lib/seo-config.ts` - 100+ targeted keywords
@@ -117,6 +136,7 @@ npm run dev
 Ready for Vercel deployment. Set all environment variables in Vercel dashboard before deploying.
 
 ## Recent Changes (December 7, 2025)
+- **Google AdSense Integration**: Admin-configurable ad placements (header, footer, sidebar, in-article)
 - Comprehensive SEO overhaul with 100+ targeted keywords
 - Created SEOHead component with JSON-LD structured data
 - Added SEO configuration file with keyword management

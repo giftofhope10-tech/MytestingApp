@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
+import { createSession } from '../../../lib/session';
 
 function hashToken(token: string): string {
   return crypto.createHash('sha256').update(token).digest('hex');
@@ -27,7 +28,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const inputHashedToken = hashToken(token);
 
     if (inputHashedToken === storedHashedToken) {
-      const sessionToken = crypto.randomBytes(32).toString('hex');
+      const adminEmail = 'admin@closetestinggroup.com';
+      const sessionToken = await createSession(adminEmail);
       
       return res.status(200).json({ 
         success: true, 

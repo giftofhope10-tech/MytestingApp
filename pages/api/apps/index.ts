@@ -1,11 +1,45 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { adminDb } from '../../../lib/firebase-admin';
 import { v4 as uuidv4 } from 'uuid';
+import { validateSession, isAdmin } from '../../../lib/session';
 import type { App } from '../../../lib/types';
+
+async function validateAdminRequest(req: NextApiRequest): Promise<{ valid: boolean; email?: string; error?: string }> {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.replace('Bearer ', '');
+
+  if (!token) {
+    return { valid: false, error: 'No session token provided' };
+  }
+
+  const session = await validateSession(token);
+  
+  if (!session.valid || !session.email) {
+    return { valid: false, error: 'Invalid or expired session' };
+  }
+
+  const adminCheck = await isAdmin(session.email);
+  
+  if (!adminCheck.isAdmin) {
+    return { valid: false, error: 'Unauthorized: Only admins can perform this action' };
+  }
+
+  return { valid: true, email: session.email };
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
+      const { adminView } = req.query;
+      
+      if (adminView) {
+        const authResult = await validateAdminRequest(req);
+        
+        if (!authResult.valid) {
+          return res.status(401).json({ error: authResult.error });
+        }
+      }
+      
       const appsRef = adminDb.collection('apps');
       const snapshot = await appsRef.orderBy('createdAt', 'desc').get();
       
@@ -13,6 +47,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       snapshot.forEach((doc) => {
         apps.push({ appId: doc.id, ...doc.data() } as App);
       });
+      
+      if (!adminView) {
+        return res.status(200).json(apps.filter(app => app.status === 'active'));
+      }
       
       return res.status(200).json(apps);
     } catch (error) {

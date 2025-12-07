@@ -61,6 +61,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
+      const appsRef = adminDb.collection('apps');
+      const appSnapshot = await appsRef.where('appId', '==', appId).get();
+      
+      if (appSnapshot.empty) {
+        return res.status(404).json({ error: 'App not found' });
+      }
+
+      const appData = appSnapshot.docs[0].data();
+      
+      if (appData.developerEmail.toLowerCase() === testerEmail.toLowerCase()) {
+        return res.status(400).json({ error: 'You cannot test your own app.' });
+      }
+
+      if (appData.status === 'completed') {
+        return res.status(400).json({ error: 'This app is no longer accepting new testers.' });
+      }
+
       const requestsRef = adminDb.collection('testerRequests');
       const existingSnapshot = await requestsRef
         .where('testerEmail', '==', testerEmail)

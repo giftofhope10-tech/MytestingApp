@@ -220,6 +220,9 @@ export default function AuthDashboard() {
                   {tab === 'apps' && '📱 Apps'}
                 </button>
               ))}
+              <Link href="/auth/ads" className="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-slate-500 border-transparent hover:text-slate-700 hover:border-slate-300 border-b-2 whitespace-nowrap">
+                📺 AdSense
+              </Link>
             </div>
           </div>
         </nav>

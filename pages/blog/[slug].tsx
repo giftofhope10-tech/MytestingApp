@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
+import { AdSenseInArticle, AdSenseSidebar } from '../../components/AdSense';
 import type { BlogPost } from '../../lib/types';
 
 const staticBlogContent: Record<string, { title: string; content: string; date: string }> = {
@@ -633,10 +634,14 @@ export default function BlogPostPage() {
             </h1>
           </header>
           
+          <AdSenseInArticle />
+          
           <div 
             className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700"
             dangerouslySetInnerHTML={{ __html: staticPost.content }}
           />
+          
+          <AdSenseSidebar />
         </article>
       </Layout>
     );
@@ -688,10 +693,14 @@ export default function BlogPostPage() {
           )}
         </header>
         
+        <AdSenseInArticle />
+        
         <div 
           className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700"
           dangerouslySetInnerHTML={{ __html: blog.content }}
         />
+        
+        <AdSenseSidebar />
       </article>
     </Layout>
   );

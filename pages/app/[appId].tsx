@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import Layout from '../../components/Layout';
+import { AdSenseSidebar } from '../../components/AdSense';
 import OTPVerification from '../../components/OTPVerification';
 import ProgressBar from '../../components/ProgressBar';
 import type { App, TesterRequest } from '../../lib/types';
@@ -302,6 +303,7 @@ export default function AppDetails() {
             </>
           )}
         </div>
+        <AdSenseSidebar />
       </div>
     </Layout>
   );

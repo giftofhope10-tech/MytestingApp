@@ -61,3 +61,16 @@ export interface AdminUser {
   role: 'admin' | 'editor';
   createdAt: number;
 }
+
+export interface SiteSettings {
+  adsEnabled: boolean;
+  adsenseClientId: string;
+  adSlots: {
+    header: string;
+    sidebar: string;
+    inArticle: string;
+    footer: string;
+  };
+  updatedAt: number;
+  updatedBy: string;
+}

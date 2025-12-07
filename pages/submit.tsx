@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 import OTPVerification from '../components/OTPVerification';
+import { PAGE_SEO } from '../lib/seo-config';
 
 export default function SubmitApp() {
   const router = useRouter();
@@ -77,7 +78,12 @@ export default function SubmitApp() {
   const currentStepIndex = steps.findIndex(s => s.id === step);
 
   return (
-    <Layout title="Submit App - Close Testing Group">
+    <Layout 
+      title={PAGE_SEO.submit.title}
+      description={PAGE_SEO.submit.description}
+      keywords={PAGE_SEO.submit.keywords}
+      breadcrumbs={[{ name: 'Submit App', path: '/submit' }]}
+    >
       <div className="max-w-2xl mx-auto px-2 sm:px-0">
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Submit Your App</h1>

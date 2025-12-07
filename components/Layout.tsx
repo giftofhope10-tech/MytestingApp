@@ -1,20 +1,38 @@
-import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { ReactNode, useState, useEffect } from 'react';
+import SEOHead from './SEOHead';
 
 interface LayoutProps {
   children: ReactNode;
   title?: string;
+  description?: string;
+  keywords?: string[];
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+  modifiedTime?: string;
+  noindex?: boolean;
+  breadcrumbs?: { name: string; path: string }[];
+  structuredData?: object;
 }
 
-export default function Layout({ children, title = 'Close Testing Group' }: LayoutProps) {
+export default function Layout({ 
+  children, 
+  title,
+  description,
+  keywords,
+  image,
+  type = 'website',
+  publishedTime,
+  modifiedTime,
+  noindex = false,
+  breadcrumbs,
+  structuredData,
+}: LayoutProps) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  const siteUrl = 'https://closetesting.online';
-  const currentUrl = `${siteUrl}${router.asPath.split('?')[0]}`;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,7 +47,9 @@ export default function Layout({ children, title = 'Close Testing Group' }: Layo
   
   const navLinks = [
     { href: '/', label: 'Apps', icon: '🎯' },
-    { href: '/submit', label: 'Submit App', icon: '📤' },
+    { href: '/beta-testers', label: 'Testers', icon: '👥' },
+    { href: '/developers', label: 'Developers', icon: '💻' },
+    { href: '/submit', label: 'Submit', icon: '📤' },
     { href: '/dashboard', label: 'Dashboard', icon: '👤' },
     { href: '/blog', label: 'Blog', icon: '📝' },
     { href: '/about', label: 'About', icon: '📖' },
@@ -56,32 +76,18 @@ export default function Layout({ children, title = 'Close Testing Group' }: Layo
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 flex flex-col">
-      <Head>
-        <title>{title}</title>
-        <meta name="description" content="Professional platform for Google Play closed testing programs. Connect developers with quality testers for Android app beta testing." />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="robots" content="index, follow" />
-        <meta name="author" content="Close Testing Group" />
-        <meta name="keywords" content="Google Play, closed testing, beta testing, Android apps, app testers, developer testing, mobile app testing" />
-        
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content="Professional platform for Google Play closed testing programs. Connect developers with quality testers." />
-        <meta property="og:site_name" content="Close Testing Group" />
-        <meta property="og:url" content={currentUrl} />
-        <meta property="og:image" content={`${siteUrl}/logo.png`} />
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content="Professional platform for Google Play closed testing programs." />
-        <meta name="twitter:image" content={`${siteUrl}/logo.png`} />
-        
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/logo.png" />
-        <link rel="canonical" href={currentUrl} />
-        
-        <meta name="theme-color" content="#4f46e5" />
-      </Head>
+      <SEOHead
+        title={title}
+        description={description}
+        keywords={keywords}
+        image={image}
+        type={type}
+        publishedTime={publishedTime}
+        modifiedTime={modifiedTime}
+        noindex={noindex}
+        breadcrumbs={breadcrumbs}
+        structuredData={structuredData}
+      />
 
       <nav className="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">

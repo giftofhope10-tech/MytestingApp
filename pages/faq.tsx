@@ -1,9 +1,27 @@
 import Link from 'next/link';
 import Layout from '../components/Layout';
+import { PAGE_SEO, generateFAQSchema } from '../lib/seo-config';
+
+const faqItems = [
+  { question: 'What is this website about?', answer: 'We publish practical guides and tutorials for app developers and testers, with a focus on testing workflows, Play Store distribution, and beta management. We also provide a platform for developers to find testers for their apps.' },
+  { question: 'Is the content original?', answer: 'Yes — all content is written by our team and reviewed for accuracy. We do not copy content from other sites.' },
+  { question: 'Do you use advertising?', answer: 'Yes — we display third-party ads (for example Google AdSense) to support the site.' },
+  { question: 'How can I request content?', answer: 'Use the Contact page to request topics. We review requests and prioritize based on user value and feasibility.' },
+  { question: 'How do you handle privacy?', answer: 'We collect minimal personal data and only when voluntarily submitted. See our Privacy Policy for full details.' },
+  { question: 'How to report a security issue or copyright takedown?', answer: 'For security or copyright concerns, please contact us immediately at support@closetesting.online.' },
+];
 
 export default function FAQ() {
+  const faqSchema = generateFAQSchema(faqItems);
+  
   return (
-    <Layout title="FAQ - Close Testing Group">
+    <Layout 
+      title={PAGE_SEO.faq.title}
+      description={PAGE_SEO.faq.description}
+      keywords={PAGE_SEO.faq.keywords}
+      breadcrumbs={[{ name: 'FAQ', path: '/faq' }]}
+      structuredData={faqSchema}
+    >
       <div className="max-w-4xl mx-auto">
         <article className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">Frequently Asked Questions (FAQ)</h1>

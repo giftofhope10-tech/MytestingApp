@@ -3,6 +3,7 @@ import Layout from '../components/Layout';
 import AppCard from '../components/AppCard';
 import Link from 'next/link';
 import type { App } from '../lib/types';
+import { PAGE_SEO, generateHowToSchema } from '../lib/seo-config';
 
 export default function Home() {
   const [apps, setApps] = useState<App[]>([]);
@@ -42,8 +43,21 @@ export default function Home() {
     completed: apps.filter(a => a.status === 'completed').length,
   };
 
+  const howToSchema = generateHowToSchema([
+    { name: 'Browse Apps', text: 'Explore the list of Android apps looking for beta testers on our platform.' },
+    { name: 'Choose an App', text: 'Select an app that interests you and click to view its details.' },
+    { name: 'Request to Join', text: 'Submit a request to join the closed testing program for that app.' },
+    { name: 'Get Approved', text: 'Wait for the developer to approve your request to become a tester.' },
+    { name: 'Start Testing', text: 'Install the app and begin your 14-day testing journey, providing valuable feedback.' },
+  ], 'How to Join a Google Play Closed Testing Program');
+
   return (
-    <Layout title="Close Testing Group - Home">
+    <Layout 
+      title={PAGE_SEO.home.title}
+      description={PAGE_SEO.home.description}
+      keywords={PAGE_SEO.home.keywords}
+      structuredData={howToSchema}
+    >
       <div className="space-y-6 sm:space-y-10">
         <div className="text-center space-y-3 sm:space-y-4 px-2">
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-indigo-50 rounded-full text-indigo-600 text-xs sm:text-sm font-medium">

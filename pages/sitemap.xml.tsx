@@ -3,18 +3,21 @@ import { GetServerSideProps } from 'next';
 const SITE_URL = 'https://closetesting.online';
 
 const staticPages = [
-  '',
-  '/about',
-  '/blog',
-  '/contact',
-  '/faq',
-  '/privacy',
-  '/terms',
-  '/cookies',
-  '/disclaimer',
-  '/dmca',
-  '/ads-disclosure',
-  '/submit',
+  { path: '', priority: '1.0', changefreq: 'daily' },
+  { path: '/beta-testers', priority: '0.9', changefreq: 'weekly' },
+  { path: '/developers', priority: '0.9', changefreq: 'weekly' },
+  { path: '/closed-testing-guide', priority: '0.9', changefreq: 'weekly' },
+  { path: '/submit', priority: '0.9', changefreq: 'weekly' },
+  { path: '/about', priority: '0.8', changefreq: 'monthly' },
+  { path: '/blog', priority: '0.9', changefreq: 'daily' },
+  { path: '/contact', priority: '0.7', changefreq: 'monthly' },
+  { path: '/faq', priority: '0.8', changefreq: 'monthly' },
+  { path: '/privacy', priority: '0.5', changefreq: 'yearly' },
+  { path: '/terms', priority: '0.5', changefreq: 'yearly' },
+  { path: '/cookies', priority: '0.5', changefreq: 'yearly' },
+  { path: '/disclaimer', priority: '0.5', changefreq: 'yearly' },
+  { path: '/dmca', priority: '0.5', changefreq: 'yearly' },
+  { path: '/ads-disclosure', priority: '0.5', changefreq: 'yearly' },
 ];
 
 const blogSlugs = [
@@ -36,10 +39,10 @@ function generateSiteMap() {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${staticPages.map(page => `  <url>
-    <loc>${SITE_URL}${page}</loc>
+    <loc>${SITE_URL}${page.path}</loc>
     <lastmod>${today}</lastmod>
-    <changefreq>${page === '' ? 'daily' : 'weekly'}</changefreq>
-    <priority>${page === '' ? '1.0' : page === '/blog' ? '0.9' : '0.8'}</priority>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
   </url>`).join('\n')}
 ${blogSlugs.map(slug => `  <url>
     <loc>${SITE_URL}/blog/${slug}</loc>

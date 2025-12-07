@@ -1,9 +1,15 @@
 import Layout from '../components/Layout';
 import Link from 'next/link';
+import { PAGE_SEO } from '../lib/seo-config';
 
 export default function About() {
   return (
-    <Layout title="About Us - Close Testing Group">
+    <Layout 
+      title={PAGE_SEO.about.title}
+      description={PAGE_SEO.about.description}
+      keywords={PAGE_SEO.about.keywords}
+      breadcrumbs={[{ name: 'About', path: '/about' }]}
+    >
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">

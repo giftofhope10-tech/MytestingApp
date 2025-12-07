@@ -22,7 +22,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const sessionToken = localStorage.getItem('adminSessionToken');
     if (!sessionToken) {
-      router.push('/admin/login');
+      router.push('/admin');
       return;
     }
 
@@ -39,13 +39,13 @@ export default function AdminDashboard() {
 
       if (!res.ok) {
         localStorage.removeItem('adminSessionToken');
-        router.push('/admin/login');
+        router.push('/admin');
         return;
       }
 
       await Promise.all([fetchApps(), fetchTesterRequests()]);
     } catch {
-      router.push('/admin/login');
+      router.push('/admin');
     } finally {
       setLoading(false);
     }
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('adminSessionToken');
-    router.push('/admin/login');
+    router.push('/admin');
   };
 
   if (loading) {

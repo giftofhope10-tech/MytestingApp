@@ -270,16 +270,29 @@ export default function AdminPanel() {
           )}
         </div>
 
-        <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Admin Management</h2>
-          <p className="text-gray-600 mb-4">
-            Manage admin users and permissions.
-          </p>
-          <Link href="/admin/users">
-            <button className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition">
-              Manage Admins
-            </button>
-          </Link>
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Apps & Testers</h2>
+            <p className="text-gray-600 mb-4">
+              Manage apps and tester requests.
+            </p>
+            <Link href="/admin/dashboard">
+              <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                Manage Apps
+              </button>
+            </Link>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Admin Users</h2>
+            <p className="text-gray-600 mb-4">
+              Manage admin users and permissions.
+            </p>
+            <Link href="/admin/users">
+              <button className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition">
+                Manage Admins
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
     </Layout>

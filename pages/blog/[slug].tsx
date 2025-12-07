@@ -587,23 +587,22 @@ export default function BlogPostPage() {
   }, [slug]);
 
   const fetchBlog = async () => {
-    if (staticBlogContent[slug as string]) {
-      setIsStatic(true);
-      setLoading(false);
-      return;
-    }
-
     try {
       const res = await fetch(`/api/blog/${slug}`);
       if (res.ok) {
         const data = await res.json();
         setBlog(data);
+        setLoading(false);
+        return;
       }
     } catch (err) {
       console.error('Failed to fetch blog:', err);
-    } finally {
-      setLoading(false);
     }
+    
+    if (staticBlogContent[slug as string]) {
+      setIsStatic(true);
+    }
+    setLoading(false);
   };
 
   if (loading) {

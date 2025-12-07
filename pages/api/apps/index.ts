@@ -56,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       apps.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       
       if (!adminView) {
-        return res.status(200).json(apps.filter(app => app.status === 'active'));
+        return res.status(200).json(apps.filter(app => app.status === 'active' || app.status === 'completed'));
       }
       
       return res.status(200).json(apps);

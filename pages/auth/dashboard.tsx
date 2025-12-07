@@ -226,7 +226,7 @@ export default function AuthDashboard() {
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {activeTab === 'dashboard' && (
-            <DashboardTab stats={stats} />
+            <DashboardTab stats={stats} sessionToken={sessionToken} onRefresh={() => fetchBlogs(sessionToken)} />
           )}
           
           {activeTab === 'blog' && (
@@ -246,7 +246,40 @@ export default function AuthDashboard() {
   );
 }
 
-function DashboardTab({ stats }: { stats: { totalApps: number; activeApps: number; totalBlogs: number; publishedBlogs: number } }) {
+function DashboardTab({ stats, sessionToken, onRefresh }: { stats: { totalApps: number; activeApps: number; totalBlogs: number; publishedBlogs: number }; sessionToken: string; onRefresh: () => void }) {
+  const [migrating, setMigrating] = useState(false);
+  const [migrateResult, setMigrateResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  const handleMigrateBlogs = async () => {
+    if (!confirm('This will migrate 10 static blog posts to the database. Continue?')) return;
+    
+    setMigrating(true);
+    setMigrateResult(null);
+    
+    try {
+      const res = await fetch('/api/admin/migrate-blogs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionToken}`,
+        },
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        setMigrateResult({ success: true, message: data.message });
+        onRefresh();
+      } else {
+        setMigrateResult({ success: false, message: data.error || 'Migration failed' });
+      }
+    } catch (err) {
+      setMigrateResult({ success: false, message: 'Migration failed' });
+    } finally {
+      setMigrating(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-slate-900">Dashboard Overview</h2>
@@ -311,14 +344,25 @@ function DashboardTab({ stats }: { stats: { totalApps: number; activeApps: numbe
               <div className="text-sm text-slate-500">Create and publish a new blog post</div>
             </div>
           </Link>
-          <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl">
-            <span className="text-2xl">📊</span>
+          <button 
+            onClick={handleMigrateBlogs}
+            disabled={migrating}
+            className="flex items-center gap-3 p-4 bg-amber-50 rounded-xl hover:bg-amber-100 transition text-left disabled:opacity-50"
+          >
+            <span className="text-2xl">{migrating ? '⏳' : '📦'}</span>
             <div>
-              <div className="font-medium text-slate-900">Manage Content</div>
-              <div className="text-sm text-slate-500">Switch to Blog or Apps tab to manage</div>
+              <div className="font-medium text-slate-900">
+                {migrating ? 'Migrating...' : 'Migrate Static Blogs'}
+              </div>
+              <div className="text-sm text-slate-500">Import 10 static blog posts to database</div>
             </div>
-          </div>
+          </button>
         </div>
+        {migrateResult && (
+          <div className={`mt-4 p-3 rounded-lg text-sm ${migrateResult.success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+            {migrateResult.message}
+          </div>
+        )}
       </div>
     </div>
   );

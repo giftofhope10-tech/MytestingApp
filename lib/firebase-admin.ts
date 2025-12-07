@@ -1,5 +1,8 @@
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
+import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+
+let adminApp: App | null = null;
+let firestoreInstance: Firestore | null = null;
 
 function parseServiceAccountKey(key: string): Record<string, unknown> {
   let parsed: Record<string, unknown>;
@@ -32,36 +35,57 @@ function parseServiceAccountKey(key: string): Record<string, unknown> {
   return parsed;
 }
 
-function getFirebaseAdmin() {
-  if (getApps().length === 0) {
-    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-    
-    if (!serviceAccount) {
-      console.error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set');
-      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY is required');
-    }
-    
-    try {
-      const parsed = parseServiceAccountKey(serviceAccount);
-      
-      if (!parsed.project_id || !parsed.private_key || !parsed.client_email) {
-        throw new Error('Service account key missing required fields (project_id, private_key, client_email)');
-      }
-      
-      if (typeof parsed.private_key === 'string') {
-        parsed.private_key = parsed.private_key.replace(/\\n/g, '\n');
-      }
-      
-      initializeApp({
-        credential: cert(parsed as Parameters<typeof cert>[0]),
-      });
-      console.log('Firebase Admin initialized successfully');
-    } catch (error) {
-      console.error('Firebase Admin initialization failed:', error);
-      throw error;
-    }
+function initializeFirebaseAdmin(): App {
+  if (getApps().length > 0) {
+    return getApps()[0];
   }
-  return getFirestore();
+  
+  const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  
+  if (!serviceAccount) {
+    console.error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set');
+    throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY is required. Please add your Firebase service account key to the Secrets.');
+  }
+  
+  try {
+    const parsed = parseServiceAccountKey(serviceAccount);
+    
+    if (!parsed.project_id || !parsed.private_key || !parsed.client_email) {
+      throw new Error('Service account key missing required fields (project_id, private_key, client_email)');
+    }
+    
+    if (typeof parsed.private_key === 'string') {
+      parsed.private_key = parsed.private_key.replace(/\\n/g, '\n');
+    }
+    
+    const app = initializeApp({
+      credential: cert(parsed as Parameters<typeof cert>[0]),
+    });
+    console.log('Firebase Admin initialized successfully');
+    return app;
+  } catch (error) {
+    console.error('Firebase Admin initialization failed:', error);
+    throw error;
+  }
 }
 
-export const adminDb = getFirebaseAdmin();
+export function getAdminDb(): Firestore {
+  if (!firestoreInstance) {
+    if (!adminApp) {
+      adminApp = initializeFirebaseAdmin();
+    }
+    firestoreInstance = getFirestore(adminApp);
+  }
+  return firestoreInstance;
+}
+
+export const adminDb = new Proxy({} as Firestore, {
+  get(_, prop) {
+    const db = getAdminDb();
+    const value = db[prop as keyof Firestore];
+    if (typeof value === 'function') {
+      return value.bind(db);
+    }
+    return value;
+  }
+});

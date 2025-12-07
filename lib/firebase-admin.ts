@@ -61,7 +61,9 @@ function initializeFirebaseAdmin(): App {
     const app = initializeApp({
       credential: cert(parsed as Parameters<typeof cert>[0]),
     });
-    console.log('Firebase Admin initialized successfully');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Firebase Admin initialized successfully');
+    }
     return app;
   } catch (error) {
     console.error('Firebase Admin initialization failed:', error);

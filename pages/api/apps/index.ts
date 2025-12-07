@@ -41,12 +41,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       
       const appsRef = adminDb.collection('apps');
-      const snapshot = await appsRef.orderBy('createdAt', 'desc').get();
+      const snapshot = await appsRef.get();
       
-      const apps: App[] = [];
+      let apps: App[] = [];
       snapshot.forEach((doc) => {
-        apps.push({ appId: doc.id, ...doc.data() } as App);
+        const data = doc.data();
+        apps.push({ 
+          appId: doc.id, 
+          ...data,
+          createdAt: data.createdAt || 0,
+        } as App);
       });
+      
+      apps.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       
       if (!adminView) {
         return res.status(200).json(apps.filter(app => app.status === 'active'));

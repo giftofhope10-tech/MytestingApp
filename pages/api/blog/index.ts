@@ -51,16 +51,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       
       const blogsRef = adminDb.collection('blogs');
       
-      const snapshot = await blogsRef.orderBy('createdAt', 'desc').get();
+      const snapshot = await blogsRef.get();
       
       let blogs: BlogPost[] = [];
       snapshot.forEach((doc) => {
-        blogs.push({ id: doc.id, ...doc.data() } as BlogPost);
+        const data = doc.data();
+        blogs.push({ 
+          id: doc.id, 
+          ...data,
+          createdAt: data.createdAt || 0,
+          updatedAt: data.updatedAt || data.createdAt || 0,
+        } as BlogPost);
       });
+      
+      blogs.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       
       if (!adminView) {
         blogs = blogs.filter(blog => blog.status === 'published');
-        blogs.sort((a, b) => (b.publishedAt || b.createdAt) - (a.publishedAt || a.createdAt));
+        blogs.sort((a, b) => (b.publishedAt || b.createdAt || 0) - (a.publishedAt || a.createdAt || 0));
       }
       
       return res.status(200).json(blogs);

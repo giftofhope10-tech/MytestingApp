@@ -181,20 +181,20 @@ export default function AuthDashboard() {
       </Head>
       <div className="min-h-screen bg-slate-50">
         <header className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white sticky top-0 z-10 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                  <span className="text-xl">🔐</span>
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-14 sm:h-16">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg sm:rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-base sm:text-xl">🔐</span>
                 </div>
                 <div>
-                  <h1 className="font-bold text-lg">Auth Panel</h1>
-                  <p className="text-xs text-purple-200">Close Testing Group</p>
+                  <h1 className="font-bold text-sm sm:text-lg">Auth Panel</h1>
+                  <p className="text-xs text-purple-200 hidden sm:block">Close Testing Group</p>
                 </div>
               </div>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition"
               >
                 Logout
               </button>
@@ -202,14 +202,14 @@ export default function AuthDashboard() {
           </div>
         </header>
 
-        <nav className="bg-white border-b border-slate-200 sticky top-16 z-10">
+        <nav className="bg-white border-b border-slate-200 sticky top-14 sm:top-16 z-10 overflow-x-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex gap-1">
+            <div className="flex gap-1 min-w-max">
               {(['dashboard', 'blog', 'apps'] as TabType[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-6 py-4 text-sm font-medium transition border-b-2 ${
+                  className={`px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium transition border-b-2 whitespace-nowrap ${
                     activeTab === tab
                       ? 'text-purple-600 border-purple-600 bg-purple-50/50'
                       : 'text-slate-500 border-transparent hover:text-slate-700 hover:border-slate-300'
@@ -335,10 +335,10 @@ function BlogTab({
 }) {
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-slate-900">Blog Management</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Blog Management</h2>
         <Link href="/auth/blog/new">
-          <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition flex items-center gap-2">
+          <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition flex items-center gap-2 text-sm sm:text-base">
             <span>+</span> New Blog Post
           </button>
         </Link>
@@ -346,19 +346,19 @@ function BlogTab({
 
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
         {blogs.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
+          <div className="p-8 sm:p-12 text-center text-slate-500">
             <span className="text-4xl block mb-4">📝</span>
             <p>No blog posts yet. Create your first one!</p>
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
             {blogs.map((blog) => (
-              <div key={blog.id} className="p-6 hover:bg-slate-50 transition">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-slate-900 truncate">{blog.title}</h3>
-                      <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+              <div key={blog.id} className="p-4 sm:p-6 hover:bg-slate-50 transition">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                  <div className="flex-1 min-w-0 w-full">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                      <h3 className="font-semibold text-slate-900 text-sm sm:text-base break-words">{blog.title}</h3>
+                      <span className={`px-2 py-1 text-xs rounded-full font-medium flex-shrink-0 ${
                         blog.status === 'published' 
                           ? 'bg-green-100 text-green-700' 
                           : 'bg-amber-100 text-amber-700'
@@ -366,17 +366,17 @@ function BlogTab({
                         {blog.status === 'published' ? 'Published' : 'Draft'}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-500 line-clamp-2 mb-2">
+                    <p className="text-xs sm:text-sm text-slate-500 line-clamp-2 mb-2">
                       {blog.excerpt || 'No excerpt available'}
                     </p>
                     <p className="text-xs text-slate-400">
                       Created: {new Date(blog.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex gap-2 flex-shrink-0">
+                  <div className="flex flex-wrap gap-2 w-full sm:w-auto sm:flex-shrink-0">
                     <button
                       onClick={() => onTogglePublish(blog)}
-                      className={`px-3 py-1.5 text-sm rounded-lg border transition ${
+                      className={`px-3 py-1.5 text-xs sm:text-sm rounded-lg border transition flex-1 sm:flex-none ${
                         blog.status === 'published'
                           ? 'border-amber-200 text-amber-600 hover:bg-amber-50'
                           : 'border-green-200 text-green-600 hover:bg-green-50'
@@ -384,19 +384,19 @@ function BlogTab({
                     >
                       {blog.status === 'published' ? 'Unpublish' : 'Publish'}
                     </button>
-                    <Link href={`/auth/blog/${blog.id}`}>
-                      <button className="px-3 py-1.5 text-sm text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition">
+                    <Link href={`/auth/blog/${blog.id}`} className="flex-1 sm:flex-none">
+                      <button className="w-full px-3 py-1.5 text-xs sm:text-sm text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition">
                         Edit
                       </button>
                     </Link>
-                    <Link href={`/blog/${blog.slug}`} target="_blank">
-                      <button className="px-3 py-1.5 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                    <Link href={`/blog/${blog.slug}`} target="_blank" className="flex-1 sm:flex-none">
+                      <button className="w-full px-3 py-1.5 text-xs sm:text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
                         View
                       </button>
                     </Link>
                     <button 
                       onClick={() => onDelete(blog.id)}
-                      className="px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition"
+                      className="px-3 py-1.5 text-xs sm:text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition flex-1 sm:flex-none"
                     >
                       Delete
                     </button>
@@ -415,16 +415,19 @@ function AppsTab({ apps, onDelete }: { apps: App[]; onDelete: (appId: string, em
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-slate-900">Apps Management</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Apps Management</h2>
+        <span className="text-xs sm:text-sm text-slate-500 bg-slate-100 px-2 sm:px-3 py-1 rounded-full">
+          {apps.length} apps
+        </span>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-        <div className="flex items-start gap-3">
-          <span className="text-xl">⚠️</span>
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-4 mb-4">
+        <div className="flex items-start gap-2 sm:gap-3">
+          <span className="text-lg sm:text-xl">⚠️</span>
           <div>
-            <h4 className="font-medium text-amber-800">Policy Concern Deletions</h4>
-            <p className="text-sm text-amber-700 mt-1">
-              When you delete an app, the developer will receive this message: <br />
+            <h4 className="font-medium text-amber-800 text-sm sm:text-base">Policy Concern Deletions</h4>
+            <p className="text-xs sm:text-sm text-amber-700 mt-1">
+              When you delete an app, the developer will receive this message: <br className="hidden sm:inline" />
               <em>"Your app has been removed due to policy concerns. Please contact our support team for more information."</em>
             </p>
           </div>
@@ -433,27 +436,27 @@ function AppsTab({ apps, onDelete }: { apps: App[]; onDelete: (appId: string, em
 
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
         {apps.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
+          <div className="p-8 sm:p-12 text-center text-slate-500">
             <span className="text-4xl block mb-4">📱</span>
             <p>No apps found</p>
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
             {apps.map((app) => (
-              <div key={app.appId} className="p-6 hover:bg-slate-50 transition">
-                <div className="flex justify-between items-center gap-4">
-                  <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+              <div key={app.appId} className="p-4 sm:p-6 hover:bg-slate-50 transition">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0 w-full">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
                       {app.iconUrl ? (
                         <img src={app.iconUrl} alt={app.name} className="w-full h-full object-cover" />
                       ) : (
-                        <span className="text-2xl">📱</span>
+                        <span className="text-xl sm:text-2xl">📱</span>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-1">
-                        <h3 className="font-semibold text-slate-900 truncate">{app.name}</h3>
-                        <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
+                        <h3 className="font-semibold text-slate-900 text-sm sm:text-base break-words">{app.name}</h3>
+                        <span className={`px-2 py-0.5 sm:py-1 text-xs rounded-full font-medium flex-shrink-0 ${
                           app.status === 'active'
                             ? 'bg-green-100 text-green-700'
                             : 'bg-slate-100 text-slate-600'
@@ -461,11 +464,11 @@ function AppsTab({ apps, onDelete }: { apps: App[]; onDelete: (appId: string, em
                           {app.status}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-500 truncate">{app.packageName}</p>
-                      <div className="flex items-center gap-4 mt-2">
+                      <p className="text-xs sm:text-sm text-slate-500 truncate">{app.packageName}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2">
                         <div className="flex items-center gap-1 text-xs text-slate-400">
                           <span>👤</span>
-                          <span className="font-medium">{app.developerEmail}</span>
+                          <span className="font-medium truncate">{app.developerEmail}</span>
                         </div>
                         {app.playLink && (
                           <a 
@@ -480,10 +483,10 @@ function AppsTab({ apps, onDelete }: { apps: App[]; onDelete: (appId: string, em
                       </div>
                     </div>
                   </div>
-                  <div className="flex-shrink-0">
+                  <div className="w-full sm:w-auto sm:flex-shrink-0">
                     <button 
                       onClick={() => onDelete(app.appId, app.developerEmail)}
-                      className="px-4 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition flex items-center gap-2"
+                      className="w-full sm:w-auto px-3 sm:px-4 py-2 text-xs sm:text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition flex items-center justify-center sm:justify-start gap-2"
                     >
                       <span>🗑️</span>
                       Delete (Policy)

@@ -1,7 +1,7 @@
 export const SEO_CONFIG = {
-  siteName: 'Close Testing Group',
+  siteName: 'Google Play Store Closed Testing',
   siteUrl: 'https://closetesting.online',
-  defaultTitle: 'Close Testing Group - Google Play Closed Testing Platform',
+  defaultTitle: 'Google Play Store Closed Testing - Close Testing Group',
   defaultDescription: 'Professional platform for Google Play closed testing programs. Connect Android app developers with quality beta testers. Join testing programs, submit apps, and get real user feedback.',
   
   primaryKeywords: [
@@ -185,9 +185,9 @@ export const STRUCTURED_DATA = {
   organization: {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Close Testing Group',
+    name: 'Google Play Store Closed Testing',
     url: 'https://closetesting.online',
-    logo: 'https://closetesting.online/logo.png',
+    logo: 'https://closetesting.online/favicon.webp',
     description: 'Professional platform for Google Play closed testing programs connecting developers with quality beta testers.',
     sameAs: [],
     contactPoint: {
@@ -199,7 +199,7 @@ export const STRUCTURED_DATA = {
   website: {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Close Testing Group',
+    name: 'Google Play Store Closed Testing',
     url: 'https://closetesting.online',
     description: 'Google Play Closed Testing Platform',
     potentialAction: {
@@ -211,7 +211,7 @@ export const STRUCTURED_DATA = {
   softwareApplication: {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Close Testing Group',
+    name: 'Google Play Store Closed Testing',
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Web',
     offers: {

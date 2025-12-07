@@ -82,8 +82,9 @@ export default function SEOHead({
       <meta name="twitter:image:alt" content={pageTitle} />
       
       <link rel="canonical" href={canonicalUrl} />
-      <link rel="icon" href="/favicon.ico" />
-      <link rel="apple-touch-icon" href="/logo.png" />
+      <link rel="icon" type="image/webp" href="/favicon.webp" />
+      <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+      <link rel="apple-touch-icon" href="/favicon.webp" />
       <link rel="manifest" href="/manifest.json" />
       
       <meta name="theme-color" content="#4f46e5" />

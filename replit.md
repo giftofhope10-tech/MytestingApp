@@ -35,7 +35,9 @@ A web platform for managing Google Play closed testing programs. Developers can 
 │   ├── Layout.tsx         # Main layout with SEO
 │   ├── AppCard.tsx        # App card display
 │   ├── OTPVerification.tsx
-│   └── ProgressBar.tsx
+│   ├── ProgressBar.tsx
+│   ├── RichTextEditor.tsx # Tiptap-based blog editor
+│   └── SEOHead.tsx        # Enhanced SEO meta tags
 ├── lib/
 │   ├── firebase.ts        # Firebase client
 │   ├── firebase-admin.ts  # Firebase admin
@@ -135,7 +137,17 @@ npm run dev
 
 Ready for Vercel deployment. Set all environment variables in Vercel dashboard before deploying.
 
-## Recent Changes (December 7, 2025)
+## Recent Changes (December 8, 2025)
+- **Professional Blog Editor**: Replaced basic textarea with Tiptap-powered rich text editor
+  - Full formatting toolbar (bold, italic, underline, strikethrough, highlight)
+  - Headings (H1, H2, H3), bullet lists, numbered lists, blockquotes, code blocks
+  - Text alignment (left, center, right)
+  - Link and image insertion with URL input dialogs
+  - Undo/redo functionality
+  - Live preview mode
+  - SSR-safe implementation with dynamic imports
+
+## Changes (December 7, 2025)
 - **Google AdSense Integration**: Admin-configurable ad placements (header, footer, sidebar, in-article)
 - Comprehensive SEO overhaul with 100+ targeted keywords
 - Created SEOHead component with JSON-LD structured data
@@ -145,7 +157,7 @@ Ready for Vercel deployment. Set all environment variables in Vercel dashboard b
 - Added PWA manifest.json
 - Self-testing prevention (developers can't test own apps)
 
-## Previous Changes (December 6, 2025)
+## Changes (December 6, 2025)
 - Admin panel simplified to token-only auth
 - Added robots.txt and sitemap.xml
 - SEO meta tags added (Open Graph, Twitter Cards)

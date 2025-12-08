@@ -138,6 +138,15 @@ npm run dev
 Ready for Vercel deployment. Set all environment variables in Vercel dashboard before deploying.
 
 ## Recent Changes (December 8, 2025)
+- **Performance Improvements**:
+  - Homepage now uses server-side rendering (SSR) for faster initial load
+  - SSR fetches data via internal API route for proper credential handling
+  - Changed Image components to native img tags to avoid hydration issues
+
+- **Logo Fix**:
+  - Fixed logo display by using correct .webp extension (was mislabeled as .png)
+  - Updated Layout.tsx, AppCard.tsx, and SEOHead.tsx references
+
 - **Comprehensive SEO Optimization**:
   - All page titles optimized to 50-60 characters for Google SERP
   - Updated meta descriptions across all pages

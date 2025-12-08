@@ -24,10 +24,6 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 32835
-externalPort = 8008
-
-[[ports]]
 localPort = 33051
 externalPort = 5000
 
@@ -50,6 +46,10 @@ externalPort = 8000
 [[ports]]
 localPort = 38093
 externalPort = 6800
+
+[[ports]]
+localPort = 38503
+externalPort = 8008
 
 [[ports]]
 localPort = 39585
@@ -94,10 +94,10 @@ args = "Next.js Dev Server"
 name = "Next.js Dev Server"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"

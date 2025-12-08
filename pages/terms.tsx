@@ -1,8 +1,13 @@
 import Layout from '../components/Layout';
+import { PAGE_SEO } from '../lib/seo-config';
 
 export default function TermsConditions() {
   return (
-    <Layout title="Terms & Conditions - Close Testing Group">
+    <Layout 
+      title={PAGE_SEO.terms.title}
+      description={PAGE_SEO.terms.description}
+      keywords={PAGE_SEO.terms.keywords}
+    >
       <div className="max-w-4xl mx-auto">
         <article className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Terms & Conditions</h1>

@@ -1,6 +1,6 @@
 import Layout from '../components/Layout';
 import Link from 'next/link';
-import { generateHowToSchema } from '../lib/seo-config';
+import { generateHowToSchema, PAGE_SEO } from '../lib/seo-config';
 
 export default function BetaTesters() {
   const howToSchema = generateHowToSchema([
@@ -14,9 +14,9 @@ export default function BetaTesters() {
 
   return (
     <Layout 
-      title="Become a Beta Tester | Join Android App Testing Programs | Close Testing Group"
-      description="Join Google Play closed testing programs as a beta tester. Get early access to new Android apps, provide feedback, and help developers improve their apps before public launch."
-      keywords={['become beta tester', 'android beta testing', 'app testing jobs', 'google play tester', 'beta tester registration', 'test android apps']}
+      title={PAGE_SEO.betaTesters.title}
+      description={PAGE_SEO.betaTesters.description}
+      keywords={PAGE_SEO.betaTesters.keywords}
       breadcrumbs={[{ name: 'Beta Testers', path: '/beta-testers' }]}
       structuredData={howToSchema}
     >

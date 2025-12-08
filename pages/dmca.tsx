@@ -2,7 +2,11 @@ import Layout from '../components/Layout';
 
 export default function DMCA() {
   return (
-    <Layout title="DMCA & Copyright - Close Testing Group">
+    <Layout 
+      title="DMCA | Close Testing Group"
+      description="DMCA and copyright policy for Close Testing Group."
+      keywords={['dmca', 'copyright', 'takedown']}
+    >
       <div className="max-w-4xl mx-auto">
         <article className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">DMCA & Copyright Policy</h1>

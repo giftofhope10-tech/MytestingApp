@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Layout from '../components/Layout';
 import OTPVerification from '../components/OTPVerification';
 import ProgressBar from '../components/ProgressBar';
+import { PAGE_SEO } from '../lib/seo-config';
 import type { App, TesterRequest } from '../lib/types';
 
 type TabType = 'developer' | 'tester';
@@ -274,7 +275,7 @@ export default function UnifiedDashboard() {
 
   if (!verified) {
     return (
-      <Layout title="Dashboard - Close Testing Group">
+      <Layout title={PAGE_SEO.dashboard.title} description={PAGE_SEO.dashboard.description} keywords={PAGE_SEO.dashboard.keywords}>
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-6">My Dashboard</h1>
@@ -300,7 +301,7 @@ export default function UnifiedDashboard() {
   const completedTests = approvedTesterRequests.filter((r) => r.rating);
 
   return (
-    <Layout title="Dashboard - Close Testing Group">
+    <Layout title={PAGE_SEO.dashboard.title} description={PAGE_SEO.dashboard.description} keywords={PAGE_SEO.dashboard.keywords}>
       <div className="space-y-6 sm:space-y-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">

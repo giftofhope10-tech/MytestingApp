@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
+import { PAGE_SEO } from '../../lib/seo-config';
 import type { BlogPost } from '../../lib/types';
 
 export default function BlogIndex() {
@@ -43,7 +44,11 @@ export default function BlogIndex() {
   }));
 
   return (
-    <Layout title="Blog - Close Testing Group">
+    <Layout 
+      title={PAGE_SEO.blog.title}
+      description={PAGE_SEO.blog.description}
+      keywords={PAGE_SEO.blog.keywords}
+    >
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Blog</h1>

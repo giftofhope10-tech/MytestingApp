@@ -3,7 +3,11 @@ import Layout from '../components/Layout';
 
 export default function AdsDisclosure() {
   return (
-    <Layout title="Advertising & AdSense Disclosure - Close Testing Group">
+    <Layout 
+      title="Ads Disclosure | Close Testing"
+      description="Advertising disclosure for Close Testing Group platform."
+      keywords={['ads', 'disclosure', 'adsense']}
+    >
       <div className="max-w-4xl mx-auto">
         <article className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Advertising & AdSense Disclosure</h1>

@@ -1,6 +1,6 @@
 import Layout from '../components/Layout';
 import Link from 'next/link';
-import { generateFAQSchema } from '../lib/seo-config';
+import { generateFAQSchema, PAGE_SEO } from '../lib/seo-config';
 
 const faqs = [
   { question: 'What is Google Play closed testing?', answer: 'Closed testing allows developers to share their Android app with a limited group of testers before public release. Testers must be invited and added to a testing list to access the app.' },
@@ -15,9 +15,9 @@ export default function ClosedTestingGuide() {
 
   return (
     <Layout 
-      title="Complete Guide to Google Play Closed Testing | Requirements & Best Practices"
-      description="Learn everything about Google Play closed testing: requirements, 20 tester minimum, 14-day testing period, and how to successfully launch your Android app. Step-by-step guide for developers."
-      keywords={['google play closed testing guide', 'closed testing requirements', '20 tester requirement', '14 day testing', 'android app launch', 'play store testing']}
+      title={PAGE_SEO.closedTestingGuide.title}
+      description={PAGE_SEO.closedTestingGuide.description}
+      keywords={PAGE_SEO.closedTestingGuide.keywords}
       breadcrumbs={[{ name: 'Closed Testing Guide', path: '/closed-testing-guide' }]}
       structuredData={faqSchema}
     >

@@ -1,8 +1,13 @@
 import Layout from '../components/Layout';
+import { PAGE_SEO } from '../lib/seo-config';
 
 export default function Contact() {
   return (
-    <Layout title="Contact Us - Close Testing Group">
+    <Layout 
+      title={PAGE_SEO.contact.title}
+      description={PAGE_SEO.contact.description}
+      keywords={PAGE_SEO.contact.keywords}
+    >
       <div className="max-w-4xl mx-auto">
         <article className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Contact Us</h1>

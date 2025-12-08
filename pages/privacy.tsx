@@ -1,8 +1,13 @@
 import Layout from '../components/Layout';
+import { PAGE_SEO } from '../lib/seo-config';
 
 export default function PrivacyPolicy() {
   return (
-    <Layout title="Privacy Policy - Close Testing Group">
+    <Layout 
+      title={PAGE_SEO.privacy.title}
+      description={PAGE_SEO.privacy.description}
+      keywords={PAGE_SEO.privacy.keywords}
+    >
       <div className="max-w-4xl mx-auto">
         <article className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>

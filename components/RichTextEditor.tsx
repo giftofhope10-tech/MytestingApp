@@ -136,8 +136,9 @@ export default function RichTextEditor({ content, onChange, placeholder = 'Start
 
   return (
     <div className="border border-slate-300 rounded-xl bg-white overflow-hidden shadow-sm">
-      <div className="bg-slate-50 border-b border-slate-200 p-2 sm:p-3 sticky top-0 z-10 overflow-x-auto">
-        <div className="flex flex-wrap gap-1 items-center min-w-max sm:min-w-0">
+      <div className="bg-slate-50 border-b border-slate-200 p-2 sticky top-0 z-10">
+        {/* Row 1: Text formatting + Link + Image (most used) */}
+        <div className="flex flex-wrap gap-1 items-center mb-2">
           <MenuButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             isActive={editor.isActive('bold')}
@@ -170,16 +171,6 @@ export default function RichTextEditor({ content, onChange, placeholder = 'Start
           </MenuButton>
 
           <MenuButton
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            isActive={editor.isActive('strike')}
-            title="Strikethrough"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.5 9.5c0-2.5-2-4.5-5.5-4.5S6 7 6 9.5c0 1.5 1 3 4 4m7.5 0H4m8.5 1c3 1 4 2.5 4 4 0 2.5-2 4.5-5.5 4.5S6 17 6 14.5" />
-            </svg>
-          </MenuButton>
-
-          <MenuButton
             onClick={() => editor.chain().focus().toggleHighlight().run()}
             isActive={editor.isActive('highlight')}
             title="Highlight"
@@ -188,8 +179,6 @@ export default function RichTextEditor({ content, onChange, placeholder = 'Start
               <path d="M15.24 2.75l5.01 5.01-8.49 8.49H6.75v-5.01l8.49-8.49zm1.06-1.06L19 4.4l-1.41 1.41L20.3 8.5l1.06-1.06c.59-.59.59-1.54 0-2.12l-2.89-2.89c-.58-.58-1.53-.58-2.12 0l-.05.06zM4 20h16v2H4v-2z"/>
             </svg>
           </MenuButton>
-
-          <Divider />
 
           <MenuButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -225,6 +214,54 @@ export default function RichTextEditor({ content, onChange, placeholder = 'Start
 
           <Divider />
 
+          {/* Link Button - Always visible in first row */}
+          <div className="relative">
+            <MenuButton
+              onClick={() => { setShowLinkInput(!showLinkInput); setShowImageInput(false); }}
+              isActive={editor.isActive('link')}
+              title="Add Link"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+            </MenuButton>
+          </div>
+
+          {/* Image Button - Always visible in first row */}
+          <div className="relative">
+            <MenuButton
+              onClick={() => { setShowImageInput(!showImageInput); setShowLinkInput(false); }}
+              title="Add Image"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </MenuButton>
+          </div>
+
+          <MenuButton
+            onClick={() => editor.chain().focus().undo().run()}
+            disabled={!editor.can().undo()}
+            title="Undo (Ctrl+Z)"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+            </svg>
+          </MenuButton>
+
+          <MenuButton
+            onClick={() => editor.chain().focus().redo().run()}
+            disabled={!editor.can().redo()}
+            title="Redo (Ctrl+Shift+Z)"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
+            </svg>
+          </MenuButton>
+        </div>
+
+        {/* Row 2: Lists, alignment, extras */}
+        <div className="flex flex-wrap gap-1 items-center">
           <MenuButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             isActive={editor.isActive('bulletList')}
@@ -302,83 +339,15 @@ export default function RichTextEditor({ content, onChange, placeholder = 'Start
 
           <Divider />
 
-          <div className="relative">
-            <MenuButton
-              onClick={() => setShowLinkInput(!showLinkInput)}
-              isActive={editor.isActive('link')}
-              title="Add Link"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-              </svg>
-            </MenuButton>
-            
-            {showLinkInput && (
-              <div className="fixed sm:absolute top-auto sm:top-full left-4 right-4 sm:left-0 sm:right-auto mt-2 p-3 bg-white border border-slate-200 rounded-xl shadow-lg z-50 sm:z-20 sm:min-w-[280px]">
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    value={linkUrl}
-                    onChange={(e) => setLinkUrl(e.target.value)}
-                    placeholder="https://example.com"
-                    className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    onKeyDown={(e) => e.key === 'Enter' && setLink()}
-                  />
-                  <button
-                    type="button"
-                    onClick={setLink}
-                    className="px-3 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 whitespace-nowrap"
-                  >
-                    Add
-                  </button>
-                </div>
-                {editor.isActive('link') && (
-                  <button
-                    type="button"
-                    onClick={removeLink}
-                    className="mt-2 text-sm text-red-600 hover:text-red-700"
-                  >
-                    Remove link
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="relative">
-            <MenuButton
-              onClick={() => setShowImageInput(!showImageInput)}
-              title="Add Image"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </MenuButton>
-            
-            {showImageInput && (
-              <div className="fixed sm:absolute top-auto sm:top-full left-4 right-4 sm:left-0 sm:right-auto mt-2 p-3 bg-white border border-slate-200 rounded-xl shadow-lg z-50 sm:z-20 sm:min-w-[280px]">
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="Image URL"
-                    className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    onKeyDown={(e) => e.key === 'Enter' && addImage()}
-                  />
-                  <button
-                    type="button"
-                    onClick={addImage}
-                    className="px-3 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 whitespace-nowrap"
-                  >
-                    Add
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <Divider />
+          <MenuButton
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            isActive={editor.isActive('strike')}
+            title="Strikethrough"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.5 9.5c0-2.5-2-4.5-5.5-4.5S6 7 6 9.5c0 1.5 1 3 4 4m7.5 0H4m8.5 1c3 1 4 2.5 4 4 0 2.5-2 4.5-5.5 4.5S6 17 6 14.5" />
+            </svg>
+          </MenuButton>
 
           <MenuButton
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
@@ -388,27 +357,78 @@ export default function RichTextEditor({ content, onChange, placeholder = 'Start
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16" />
             </svg>
           </MenuButton>
-
-          <MenuButton
-            onClick={() => editor.chain().focus().undo().run()}
-            disabled={!editor.can().undo()}
-            title="Undo (Ctrl+Z)"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-            </svg>
-          </MenuButton>
-
-          <MenuButton
-            onClick={() => editor.chain().focus().redo().run()}
-            disabled={!editor.can().redo()}
-            title="Redo (Ctrl+Shift+Z)"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
-            </svg>
-          </MenuButton>
         </div>
+
+        {/* Link Input Popup */}
+        {showLinkInput && (
+          <div className="mt-2 p-3 bg-white border border-slate-200 rounded-xl shadow-lg">
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="https://example.com"
+                className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                onKeyDown={(e) => e.key === 'Enter' && setLink()}
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={setLink}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 whitespace-nowrap"
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowLinkInput(false)}
+                className="px-3 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-300"
+              >
+                Cancel
+              </button>
+            </div>
+            {editor.isActive('link') && (
+              <button
+                type="button"
+                onClick={removeLink}
+                className="mt-2 text-sm text-red-600 hover:text-red-700"
+              >
+                Remove link
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Image Input Popup */}
+        {showImageInput && (
+          <div className="mt-2 p-3 bg-white border border-slate-200 rounded-xl shadow-lg">
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="Image URL"
+                className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                onKeyDown={(e) => e.key === 'Enter' && addImage()}
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={addImage}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 whitespace-nowrap"
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowImageInput(false)}
+                className="px-3 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <EditorContent 

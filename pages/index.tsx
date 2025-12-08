@@ -2,12 +2,13 @@ import { useState } from 'react';
 import Layout from '../components/Layout';
 import AppCard from '../components/AppCard';
 import Link from 'next/link';
-import type { App } from '../lib/types';
+import type { App, BlogPost } from '../lib/types';
 import { PAGE_SEO, generateHowToSchema } from '../lib/seo-config';
 import { GetServerSideProps } from 'next';
 
 interface HomeProps {
   apps: App[];
+  recentBlogs: BlogPost[];
 }
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async (context) => {
@@ -16,29 +17,37 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (context)
     const host = context.req.headers.host || 'localhost:5000';
     const baseUrl = `${protocol}://${host}`;
     
-    const res = await fetch(`${baseUrl}/api/apps`);
-    if (!res.ok) {
-      throw new Error(`API returned ${res.status}`);
-    }
+    const [appsRes, blogsRes] = await Promise.all([
+      fetch(`${baseUrl}/api/apps`),
+      fetch(`${baseUrl}/api/blog`)
+    ]);
     
-    const apps: App[] = await res.json();
+    const apps: App[] = appsRes.ok ? await appsRes.json() : [];
+    const allBlogs: BlogPost[] = blogsRes.ok ? await blogsRes.json() : [];
+    
+    const recentBlogs = allBlogs
+      .filter(blog => blog.status === 'published')
+      .sort((a, b) => (b.publishedAt || b.createdAt) - (a.publishedAt || a.createdAt))
+      .slice(0, 5);
     
     return {
       props: {
         apps: Array.isArray(apps) ? apps : [],
+        recentBlogs,
       },
     };
   } catch (error) {
-    console.error('Error fetching apps:', error);
+    console.error('Error fetching data:', error);
     return {
       props: {
         apps: [],
+        recentBlogs: [],
       },
     };
   }
 };
 
-export default function Home({ apps }: HomeProps) {
+export default function Home({ apps, recentBlogs }: HomeProps) {
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
 
   const filteredApps = apps.filter((app) => {
@@ -142,6 +151,60 @@ export default function Home({ apps }: HomeProps) {
             {filteredApps.map((app) => (
               <AppCard key={app.appId} app={app} />
             ))}
+          </div>
+        )}
+
+        {/* Recent Blog Posts Section */}
+        {recentBlogs.length > 0 && (
+          <div className="mt-10 sm:mt-16 pt-8 sm:pt-10 border-t border-slate-200">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 px-2 sm:px-0">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Recent Blog Posts</h2>
+              <Link 
+                href="/blog" 
+                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
+              >
+                View All
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+            <div className="space-y-3 sm:space-y-4">
+              {recentBlogs.map((blog) => (
+                <Link
+                  key={blog.id}
+                  href={`/blog/${blog.slug}`}
+                  className="block bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all duration-200 group"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors text-sm sm:text-base line-clamp-2">
+                        {blog.title}
+                      </h3>
+                      <p className="text-slate-500 text-xs sm:text-sm mt-1 line-clamp-2">
+                        {blog.excerpt}
+                      </p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
+                        <span>{blog.author}</span>
+                        <span>•</span>
+                        <span>
+                          {new Date(blog.publishedAt || blog.createdAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg sm:rounded-xl flex items-center justify-center text-indigo-600 group-hover:from-indigo-200 group-hover:to-purple-200 transition-colors">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         )}
       </div>

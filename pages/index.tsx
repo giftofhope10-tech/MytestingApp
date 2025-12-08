@@ -1,36 +1,45 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Layout from '../components/Layout';
 import AppCard from '../components/AppCard';
 import Link from 'next/link';
 import type { App } from '../lib/types';
 import { PAGE_SEO, generateHowToSchema } from '../lib/seo-config';
+import { GetServerSideProps } from 'next';
 
-export default function Home() {
-  const [apps, setApps] = useState<App[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+interface HomeProps {
+  apps: App[];
+}
 
-  useEffect(() => {
-    fetchApps();
-  }, []);
-
-  const fetchApps = async () => {
-    try {
-      const res = await fetch('/api/apps');
-      const data = await res.json();
-      if (res.ok && Array.isArray(data)) {
-        setApps(data);
-      } else {
-        console.error('Failed to fetch apps:', data?.error || 'Invalid response');
-        setApps([]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch apps:', error);
-      setApps([]);
-    } finally {
-      setLoading(false);
+export const getServerSideProps: GetServerSideProps<HomeProps> = async (context) => {
+  try {
+    const protocol = context.req.headers['x-forwarded-proto'] || 'http';
+    const host = context.req.headers.host || 'localhost:5000';
+    const baseUrl = `${protocol}://${host}`;
+    
+    const res = await fetch(`${baseUrl}/api/apps`);
+    if (!res.ok) {
+      throw new Error(`API returned ${res.status}`);
     }
-  };
+    
+    const apps: App[] = await res.json();
+    
+    return {
+      props: {
+        apps: Array.isArray(apps) ? apps : [],
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching apps:', error);
+    return {
+      props: {
+        apps: [],
+      },
+    };
+  }
+};
+
+export default function Home({ apps }: HomeProps) {
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
 
   const filteredApps = apps.filter((app) => {
     if (filter === 'all') return true;
@@ -109,14 +118,7 @@ export default function Home() {
           </div>
         </div>
 
-        {loading ? (
-          <div className="text-center py-12 sm:py-16">
-            <div className="inline-block">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-            </div>
-            <p className="mt-4 text-slate-500 text-sm sm:text-base">Loading apps...</p>
-          </div>
-        ) : filteredApps.length === 0 ? (
+        {filteredApps.length === 0 ? (
           <div className="text-center py-12 sm:py-16 bg-white rounded-2xl sm:rounded-3xl border border-slate-100 shadow-sm mx-2 sm:mx-0">
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl sm:rounded-3xl mx-auto flex items-center justify-center mb-4 sm:mb-6">
               <span className="text-3xl sm:text-4xl">📱</span>

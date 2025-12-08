@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { ReactNode, useState, useEffect } from 'react';
 import SEOHead from './SEOHead';
@@ -94,13 +93,10 @@ export default function Layout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
-              <Image 
-                src="/logo.png" 
+              <img 
+                src="/logo.webp" 
                 alt="Close Testing Group" 
-                width={350} 
-                height={100} 
                 className="h-20 sm:h-24 md:h-28 w-auto object-contain"
-                priority
               />
             </Link>
             
@@ -187,11 +183,9 @@ export default function Layout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
             <div className="sm:col-span-2 lg:col-span-1">
-              <Image 
-                src="/logo.png" 
+              <img 
+                src="/logo.webp" 
                 alt="Close Testing Group" 
-                width={200} 
-                height={60} 
                 className="h-16 w-auto object-contain mb-4 brightness-0 invert"
               />
               <p className="text-slate-400 text-sm leading-relaxed">

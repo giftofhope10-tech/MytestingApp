@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import type { App } from '../lib/types';
 
 interface AppCardProps {
@@ -13,7 +12,7 @@ export default function AppCard({ app }: AppCardProps) {
         <div className="flex items-start gap-3 sm:gap-4">
           <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-slate-100 to-slate-50 rounded-xl sm:rounded-2xl flex items-center justify-center overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
             {app.iconUrl && app.iconUrl !== '/default-icon.png' ? (
-              <Image src={app.iconUrl} alt={app.name} width={64} height={64} className="w-full h-full object-cover" unoptimized />
+              <img src={app.iconUrl} alt={app.name} className="w-full h-full object-cover" />
             ) : (
               <span className="text-2xl sm:text-3xl">📱</span>
             )}

@@ -35,7 +35,7 @@ export default function SEOHead({
   const pageTitle = title || defaultTitle;
   const pageDescription = description || defaultDescription;
   const pageKeywords = [...new Set([...keywords, ...primaryKeywords])].slice(0, 15);
-  const pageImage = image || `${siteUrl}/logo.png`;
+  const pageImage = image || `${siteUrl}/logo.webp`;
   const canonicalUrl = `${siteUrl}${router.asPath.split('?')[0]}`;
   
   const breadcrumbSchema = breadcrumbs

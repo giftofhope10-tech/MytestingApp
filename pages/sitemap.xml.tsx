@@ -94,37 +94,44 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   let blogs: BlogData[] = [];
   let apps: { appId: string; createdAt?: number }[] = [];
   
-  try {
-    const blogsSnapshot = await adminDb.collection('blogs').get();
-    blogsSnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (data.status === 'published') {
-        blogs.push({
-          slug: data.slug,
-          updatedAt: data.updatedAt,
-          publishedAt: data.publishedAt,
-          createdAt: data.createdAt,
-          status: data.status,
-        });
-      }
-    });
-  } catch (error) {
-    console.error('Error fetching blogs for sitemap:', error);
-  }
+  // Check if Firebase is configured before attempting to fetch
+  const hasFirebaseConfig = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
   
-  try {
-    const appsSnapshot = await adminDb.collection('apps').get();
-    appsSnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (data.status === 'active' || data.status === 'completed') {
-        apps.push({
-          appId: doc.id,
-          createdAt: data.createdAt,
-        });
-      }
-    });
-  } catch (error) {
-    console.error('Error fetching apps for sitemap:', error);
+  if (hasFirebaseConfig) {
+    try {
+      const blogsSnapshot = await adminDb.collection('blogs').get();
+      blogsSnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.status === 'published') {
+          blogs.push({
+            slug: data.slug,
+            updatedAt: data.updatedAt,
+            publishedAt: data.publishedAt,
+            createdAt: data.createdAt,
+            status: data.status,
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching blogs for sitemap:', error);
+    }
+    
+    try {
+      const appsSnapshot = await adminDb.collection('apps').get();
+      appsSnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.status === 'active' || data.status === 'completed') {
+          apps.push({
+            appId: doc.id,
+            createdAt: data.createdAt,
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching apps for sitemap:', error);
+    }
+  } else {
+    console.log('Sitemap: Firebase not configured, using static blog slugs only');
   }
   
   const sitemap = generateSiteMap(blogs, apps);

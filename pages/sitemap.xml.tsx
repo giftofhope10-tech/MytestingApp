@@ -9,6 +9,7 @@ const staticPages = [
   { path: '/developers', priority: '0.9', changefreq: 'weekly' },
   { path: '/closed-testing-guide', priority: '0.9', changefreq: 'weekly' },
   { path: '/submit', priority: '0.9', changefreq: 'weekly' },
+  { path: '/all-pages', priority: '0.8', changefreq: 'weekly' },
   { path: '/about', priority: '0.8', changefreq: 'monthly' },
   { path: '/blog', priority: '0.9', changefreq: 'daily' },
   { path: '/contact', priority: '0.7', changefreq: 'monthly' },

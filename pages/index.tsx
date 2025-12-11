@@ -154,6 +154,19 @@ export default function Home({ apps, recentBlogs }: HomeProps) {
           </div>
         )}
 
+        {/* See All Pages Link */}
+        <div className="flex justify-center mt-6">
+          <Link
+            href="/all-pages"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-indigo-600 bg-white/70 hover:bg-indigo-50 rounded-xl border border-slate-200 hover:border-indigo-200 transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+            See All Pages
+          </Link>
+        </div>
+
         {/* Recent Blog Posts Section */}
         {recentBlogs.length > 0 && (
           <div className="mt-10 sm:mt-16 pt-8 sm:pt-10 border-t border-slate-200">

@@ -1,31 +1,38 @@
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Layout from '../../components/Layout';
 import { PAGE_SEO } from '../../lib/seo-config';
 import type { BlogPost } from '../../lib/types';
+import { GetServerSideProps } from 'next';
 
-export default function BlogIndex() {
-  const [blogs, setBlogs] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
+interface BlogIndexProps {
+  blogs: BlogPost[];
+}
 
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
+export const getServerSideProps: GetServerSideProps<BlogIndexProps> = async (context) => {
+  try {
+    const protocol = context.req.headers['x-forwarded-proto'] || 'http';
+    const host = context.req.headers.host || 'localhost:5000';
+    const baseUrl = `${protocol}://${host}`;
+    
+    const res = await fetch(`${baseUrl}/api/blog`);
+    const blogs: BlogPost[] = res.ok ? await res.json() : [];
+    
+    return {
+      props: {
+        blogs: Array.isArray(blogs) ? blogs : [],
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+    return {
+      props: {
+        blogs: [],
+      },
+    };
+  }
+};
 
-  const fetchBlogs = async () => {
-    try {
-      const res = await fetch('/api/blog');
-      if (res.ok) {
-        const data = await res.json();
-        setBlogs(data);
-      }
-    } catch (err) {
-      console.error('Failed to fetch blogs:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+export default function BlogIndex({ blogs }: BlogIndexProps) {
   const formattedBlogs = blogs.map(blog => ({
     slug: blog.slug,
     title: blog.title,
@@ -48,6 +55,7 @@ export default function BlogIndex() {
       title={PAGE_SEO.blog.title}
       description={PAGE_SEO.blog.description}
       keywords={PAGE_SEO.blog.keywords}
+      breadcrumbs={[{ name: 'Blog', path: '/blog' }]}
     >
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
@@ -55,9 +63,9 @@ export default function BlogIndex() {
           <p className="text-gray-600 text-lg">Helpful guides and tutorials for developers and testers</p>
         </div>
 
-        {loading ? (
+        {formattedBlogs.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">Loading blogs...</p>
+            <p className="text-gray-500">No blog posts yet. Check back soon!</p>
           </div>
         ) : (
           <div className="space-y-6">

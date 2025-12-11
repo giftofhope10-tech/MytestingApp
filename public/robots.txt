@@ -1,10 +1,20 @@
 User-agent: *
 Allow: /
+Allow: /api/settings/ads
+Allow: /api/blog
+Allow: /api/apps
 
 Disallow: /admin/
-Disallow: /api/
+Disallow: /api/admin/
+Disallow: /api/send-otp
+Disallow: /api/verify-otp
+Disallow: /api/delete-account
+Disallow: /api/check-in
+Disallow: /api/check-verified
+Disallow: /api/tester-requests/
 Disallow: /dashboard
 Disallow: /developer
 Disallow: /tester
+Disallow: /auth/
 
 Sitemap: https://closetesting.online/sitemap.xml

@@ -3,7 +3,17 @@ import { Resend } from 'resend';
 import { generateOTP, storeOTP } from '../../lib/otp';
 import { isTempMail } from '../../lib/tempmail';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend {
+  if (!resendClient) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resendClient;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -22,6 +32,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const otp = generateOTP();
   
+  let resend: Resend;
+  try {
+    resend = getResendClient();
+  } catch (error) {
+    console.error('Resend initialization failed:', error);
+    return res.status(500).json({ error: 'Email service not configured properly.' });
+  }
+
   try {
     await storeOTP(email, otp);
   } catch (storeError) {

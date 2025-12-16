@@ -83,14 +83,14 @@ export default function Home({ apps, recentBlogs }: HomeProps) {
             Beta Testing Platform
           </div>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
-            Google Play{' '}
-            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Closed Testing
-            </span>
+            Google Play Closed Testing Platform
           </h1>
+          <p className="text-base sm:text-xl text-slate-700 max-w-2xl mx-auto font-medium">
+            Find <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-bold">Real Beta Testers</span> for Your Android App
+          </p>
           <p className="text-sm sm:text-lg text-slate-500 max-w-2xl mx-auto">
             Join exclusive beta programs or submit your app for testing. 
-            Get real feedback from real testers.
+            Get verified testers and quality feedback fast.
           </p>
         </div>
 

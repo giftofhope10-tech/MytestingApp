@@ -1,8 +1,8 @@
 export const SEO_CONFIG = {
   siteName: 'Close Testing Group',
   siteUrl: 'https://closetesting.online',
-  defaultTitle: 'Close Testing Group | Beta Testers',
-  defaultDescription: 'Find beta testers for your Android app. Join Google Play closed testing programs and get real feedback from verified testers.',
+  defaultTitle: 'Google Play Closed Testing Platform | Find Real Beta Testers',
+  defaultDescription: 'Find real beta testers for your Android app. Join Close Testing Group - the professional platform for Google Play closed testing. Get verified testers and quality feedback fast.',
   
   primaryKeywords: [
     'google play closed testing',
@@ -64,9 +64,9 @@ SEO_CONFIG.allKeywords = [
 
 export const PAGE_SEO = {
   home: {
-    title: 'Google Play Closed Testing Platform | Find Beta Testers',
-    description: 'Find beta testers for Android apps. Join closed testing programs and get real feedback.',
-    keywords: ['beta testers', 'closed testing', 'android testing', 'app testers'],
+    title: 'Google Play Closed Testing Platform | Find Real Beta Testers - Close Testing Group',
+    description: 'Find real beta testers for your Android app. Close Testing Group is the professional platform for Google Play closed testing. Get 20+ verified testers, real feedback, and launch faster.',
+    keywords: ['google play closed testing', 'beta testers', 'android beta testing', 'closed testing platform', 'app testers'],
   },
   submit: {
     title: 'Submit Android App for Beta Testing | Close Testing Group',
